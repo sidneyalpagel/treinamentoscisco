@@ -1,0 +1,110 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Treinamento;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Administrador padrão (idempotente)
+        User::updateOrCreate(
+            ['email' => 'admin@treinamentos.gov.br'],
+            [
+                'name' => 'Administrador',
+                'password' => 'admin123',
+            ]
+        );
+
+        // Treinamentos de exemplo
+        $exemplos = [
+            [
+                'slug' => 'atendimento-humanizado-ao-cidadao',
+                'titulo' => 'Atendimento Humanizado ao Cidadão',
+                'descricao' => "Capacitação voltada à melhoria da qualidade do atendimento ao público, com foco no acolhimento, na empatia e na comunicação eficaz.\n\nConteúdo:\n- Princípios do acolhimento\n- Comunicação não violenta\n- Gestão de conflitos no atendimento",
+                'publico_alvo' => 'Servidores da recepção e atendimento ao público',
+                'instrutor' => 'Equipe de Desenvolvimento de Pessoas',
+                'carga_horaria' => 8,
+                'modalidade' => Treinamento::MODALIDADE_PRESENCIAL,
+                'local' => 'Auditório Central',
+                'vagas' => 40,
+                'dias' => 7,
+                'status' => Treinamento::STATUS_PUBLICADO,
+            ],
+            [
+                'slug' => 'seguranca-do-paciente',
+                'titulo' => 'Segurança do Paciente e Controle de Infecção',
+                'descricao' => 'Treinamento sobre protocolos de segurança do paciente, higienização das mãos e prevenção de infecções relacionadas à assistência à saúde.',
+                'publico_alvo' => 'Profissionais da área da saúde',
+                'instrutor' => 'Comissão de Controle de Infecção',
+                'carga_horaria' => 16,
+                'modalidade' => Treinamento::MODALIDADE_PRESENCIAL,
+                'local' => 'Centro de Especialidades',
+                'vagas' => 25,
+                'dias' => 15,
+                'status' => Treinamento::STATUS_PUBLICADO,
+            ],
+            [
+                'slug' => 'lgpd-na-administracao-publica',
+                'titulo' => 'LGPD na Administração Pública',
+                'descricao' => 'Fundamentos da Lei Geral de Proteção de Dados aplicados ao setor público: tratamento de dados pessoais, direitos dos titulares e boas práticas.',
+                'publico_alvo' => 'Todos os servidores',
+                'instrutor' => 'Assessoria Jurídica',
+                'carga_horaria' => 4,
+                'modalidade' => Treinamento::MODALIDADE_ONLINE,
+                'local' => 'Transmissão online',
+                'vagas' => null,
+                'dias' => 22,
+                'status' => Treinamento::STATUS_PUBLICADO,
+            ],
+            [
+                'slug' => 'primeiros-socorros',
+                'titulo' => 'Primeiros Socorros no Ambiente de Trabalho',
+                'descricao' => 'Noções básicas de primeiros socorros, suporte básico de vida e procedimentos de emergência.',
+                'publico_alvo' => 'Brigadistas e interessados',
+                'instrutor' => 'Corpo de Bombeiros (parceria)',
+                'carga_horaria' => 6,
+                'modalidade' => Treinamento::MODALIDADE_PRESENCIAL,
+                'local' => 'Sala de Treinamento 2',
+                'vagas' => 30,
+                'dias' => 4,
+                'status' => Treinamento::STATUS_PUBLICADO,
+            ],
+            [
+                'slug' => 'gestao-de-processos-e-qualidade',
+                'titulo' => 'Gestão de Processos e Qualidade',
+                'descricao' => 'Introdução ao mapeamento de processos, indicadores e melhoria contínua na administração pública.',
+                'publico_alvo' => 'Gestores e coordenadores',
+                'instrutor' => 'Setor de Planejamento',
+                'carga_horaria' => 12,
+                'modalidade' => Treinamento::MODALIDADE_HIBRIDO,
+                'local' => 'Auditório Central + Online',
+                'vagas' => 35,
+                'dias' => 30,
+                'status' => Treinamento::STATUS_RASCUNHO,
+            ],
+        ];
+
+        foreach ($exemplos as $dados) {
+            $dias = $dados['dias'];
+            unset($dados['dias']);
+
+            $inicio = Carbon::now()->addDays($dias)->setTime(9, 0);
+
+            Treinamento::updateOrCreate(
+                ['slug' => $dados['slug']],
+                array_merge($dados, [
+                    'data_inicio' => $inicio,
+                    'data_fim' => (clone $inicio)->addHours(min($dados['carga_horaria'], 8)),
+                    'inscricoes_ate' => (clone $inicio)->subDays(2)->toDateString(),
+                    'permite_inscricao' => true,
+                    'gera_certificado' => true,
+                ])
+            );
+        }
+    }
+}
