@@ -20,6 +20,7 @@ class InscricaoController extends Controller
     {
         return Inscricao::query()
             ->with('treinamento')
+            ->whereHas('treinamento', fn ($q) => $q->doUsuario($request->user()->id))
             ->when($request->filled('treinamento'), fn ($q) => $q->where('treinamento_id', $request->integer('treinamento')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
             ->when($request->filled('busca'), function ($q) use ($request) {
@@ -40,15 +41,17 @@ class InscricaoController extends Controller
 
         return view('admin.inscricoes.index', [
             'inscricoes' => $inscricoes,
-            'treinamentos' => Treinamento::orderBy('titulo')->get(['id', 'titulo']),
+            'treinamentos' => Treinamento::doUsuario($request->user()->id)->orderBy('titulo')->get(['id', 'titulo']),
             'statusDisponiveis' => Inscricao::statusDisponiveis(),
             'filtros' => $request->only(['treinamento', 'status', 'busca']),
-            'total' => (clone $inscricoes)->total(),
+            'total' => $inscricoes->total(),
         ]);
     }
 
     public function update(Request $request, Inscricao $inscricao): RedirectResponse
     {
+        $this->autorizarDono($inscricao);
+
         $dados = Validator::make($request->all(), [
             'status' => ['required', 'in:'.implode(',', array_keys(Inscricao::statusDisponiveis()))],
         ])->validate();
@@ -60,9 +63,19 @@ class InscricaoController extends Controller
 
     public function destroy(Inscricao $inscricao): RedirectResponse
     {
+        $this->autorizarDono($inscricao);
+
         $inscricao->delete();
 
         return back()->with('sucesso', 'Inscrição removida.');
+    }
+
+    /**
+     * Garante que a inscrição pertence a um treinamento do gestor autenticado.
+     */
+    private function autorizarDono(Inscricao $inscricao): void
+    {
+        abort_unless($inscricao->treinamento->user_id === auth()->id(), 403);
     }
 
     /**

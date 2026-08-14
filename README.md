@@ -30,14 +30,24 @@ listas de presença e emissão de certificados.
    - Site público / agenda: <http://127.0.0.1:8000>
    - Painel administrativo: <http://127.0.0.1:8000/login>
 
-### Credenciais do administrador (ambiente de desenvolvimento)
+### Papéis e acesso
 
-| Campo   | Valor                          |
-|---------|--------------------------------|
-| E-mail  | `admin@treinamentos.gov.br`    |
-| Senha   | `admin123`                     |
+A plataforma tem dois papéis:
 
-> ⚠️ Troque a senha antes de colocar em produção.
+- **Administrador Geral** (`admin`) — dashboard em `/gestao`: cadastra **usuários** (gestores), **áreas/setores** e redefine senhas. Não cadastra treinamentos.
+- **Gestor de Treinamentos** (`gestor`) — painel em `/admin`, vinculado a uma área, vê e gerencia **apenas os treinamentos que ele mesmo criou**.
+
+O login (`/login`) redireciona automaticamente conforme o papel. Usuários desativados não conseguem entrar.
+
+### Credenciais (ambiente de desenvolvimento)
+
+| Papel | E-mail | Senha | Área |
+|---|---|---|---|
+| Administrador Geral | `admin@treinamentos.gov.br` | `admin123` | — |
+| Gestor | `gestor.saude@treinamentos.gov.br` | `gestor123` | Atenção à Saúde |
+| Gestor | `gestor.adm@treinamentos.gov.br` | `gestor123` | Administrativo |
+
+> ⚠️ Troque as senhas antes de colocar em produção.
 
 ## Comandos úteis
 

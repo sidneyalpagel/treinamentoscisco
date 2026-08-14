@@ -29,7 +29,7 @@
                 <div class="flex items-center gap-4">
                     <div class="text-right leading-tight hidden sm:block">
                         <div class="text-sm font-medium text-slate-700">{{ auth()->user()->name }}</div>
-                        <div class="text-xs text-slate-400">Administrador</div>
+                        <div class="text-xs text-slate-400">{{ optional(auth()->user()->area)->nome ?? 'Gestor de Treinamentos' }}</div>
                     </div>
                     <div class="grid place-items-center w-9 h-9 rounded-full bg-brand-100 text-brand-800 font-semibold text-sm">
                         {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}

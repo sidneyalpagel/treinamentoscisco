@@ -40,9 +40,27 @@ class LoginController extends Controller
             ]);
         }
 
+        // Bloqueia acesso de usuários desativados
+        if (! Auth::user()->ativo) {
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email' => 'Seu acesso está desativado. Contate o administrador.',
+            ]);
+        }
+
         $request->session()->regenerate();
 
-        return redirect()->intended(route('admin.dashboard'));
+        return redirect()->to($this->rotaInicial());
+    }
+
+    /**
+     * Rota inicial conforme o papel do usuário autenticado.
+     */
+    private function rotaInicial(): string
+    {
+        return Auth::user()->isAdmin()
+            ? route('gestao.dashboard')
+            : route('admin.dashboard');
     }
 
     /**

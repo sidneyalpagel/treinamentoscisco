@@ -17,6 +17,7 @@ class TreinamentoController extends Controller
     public function index(Request $request): View
     {
         $treinamentos = Treinamento::query()
+            ->doUsuario($request->user()->id)
             ->when($request->filled('busca'), function ($q) use ($request) {
                 $termo = $request->string('busca');
                 $q->where(fn ($sub) => $sub
@@ -46,7 +47,9 @@ class TreinamentoController extends Controller
 
     public function store(TreinamentoRequest $request): RedirectResponse
     {
-        $treinamento = Treinamento::create($request->validated());
+        $treinamento = Treinamento::create($request->validated() + [
+            'user_id' => $request->user()->id,
+        ]);
 
         return redirect()
             ->route('admin.treinamentos.show', $treinamento)
@@ -55,11 +58,15 @@ class TreinamentoController extends Controller
 
     public function show(Treinamento $treinamento): View
     {
+        $this->autorizarDono($treinamento);
+
         return view('admin.treinamentos.show', compact('treinamento'));
     }
 
     public function edit(Treinamento $treinamento): View
     {
+        $this->autorizarDono($treinamento);
+
         return view('admin.treinamentos.edit', [
             'treinamento' => $treinamento,
             'statusDisponiveis' => Treinamento::statusDisponiveis(),
@@ -69,6 +76,8 @@ class TreinamentoController extends Controller
 
     public function update(TreinamentoRequest $request, Treinamento $treinamento): RedirectResponse
     {
+        $this->autorizarDono($treinamento);
+
         $treinamento->update($request->validated());
 
         return redirect()
@@ -78,10 +87,20 @@ class TreinamentoController extends Controller
 
     public function destroy(Treinamento $treinamento): RedirectResponse
     {
+        $this->autorizarDono($treinamento);
+
         $treinamento->delete();
 
         return redirect()
             ->route('admin.treinamentos.index')
             ->with('sucesso', 'Treinamento removido com sucesso.');
+    }
+
+    /**
+     * Garante que o treinamento pertence ao gestor autenticado.
+     */
+    private function autorizarDono(Treinamento $treinamento): void
+    {
+        abort_unless($treinamento->user_id === auth()->id(), 403);
     }
 }

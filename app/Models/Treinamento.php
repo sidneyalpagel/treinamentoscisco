@@ -23,6 +23,7 @@ class Treinamento extends Model
     public const MODALIDADE_HIBRIDO = 'hibrido';
 
     protected $fillable = [
+        'user_id',
         'titulo',
         'slug',
         'descricao',
@@ -84,6 +85,11 @@ class Treinamento extends Model
     /* Relações                                                              */
     /* --------------------------------------------------------------------- */
 
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function inscricoes(): HasMany
     {
         return $this->hasMany(Inscricao::class);
@@ -106,6 +112,11 @@ class Treinamento extends Model
     public function scopePublicados($query)
     {
         return $query->where('status', self::STATUS_PUBLICADO);
+    }
+
+    public function scopeDoUsuario($query, int $userId)
+    {
+        return $query->where('user_id', $userId);
     }
 
     public function scopeProximos($query)

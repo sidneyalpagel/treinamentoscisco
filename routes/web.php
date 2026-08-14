@@ -7,6 +7,9 @@ use App\Http\Controllers\Admin\SessaoController;
 use App\Http\Controllers\Admin\TreinamentoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CertificadoPublicoController;
+use App\Http\Controllers\Gestao\AreaController;
+use App\Http\Controllers\Gestao\DashboardController as GestaoDashboardController;
+use App\Http\Controllers\Gestao\UsuarioController;
 use App\Http\Controllers\PresencaController;
 use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
@@ -45,7 +48,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->
 | Painel administrativo
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')
+Route::middleware(['auth', 'role:gestor'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -74,4 +77,20 @@ Route::middleware('auth')
         Route::post('treinamentos/{treinamento}/certificados/emitir', [CertificadoController::class, 'emitirTodos'])->name('certificados.emitir-todos');
         Route::post('inscricoes/{inscricao}/certificado', [CertificadoController::class, 'emitir'])->name('certificados.emitir');
         Route::delete('certificados/{certificado}', [CertificadoController::class, 'destroy'])->name('certificados.destroy');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Administração Geral da plataforma (super-admin)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('gestao')
+    ->name('gestao.')
+    ->group(function () {
+        Route::get('/', [GestaoDashboardController::class, 'index'])->name('dashboard');
+        Route::resource('areas', AreaController::class)->except(['show']);
+        Route::resource('usuarios', UsuarioController::class)->except(['show']);
+        Route::patch('usuarios/{usuario}/senha', [UsuarioController::class, 'redefinirSenha'])->name('usuarios.senha');
+        Route::patch('usuarios/{usuario}/status', [UsuarioController::class, 'alternarStatus'])->name('usuarios.status');
     });

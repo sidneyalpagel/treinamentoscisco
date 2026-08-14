@@ -17,6 +17,7 @@ class CertificadoController extends Controller
     public function painel(): View
     {
         $treinamentos = Treinamento::query()
+            ->doUsuario(auth()->id())
             ->where('gera_certificado', true)
             ->withCount([
                 'inscricoes as confirmados_count' => fn ($q) => $q->confirmadas(),
@@ -33,6 +34,8 @@ class CertificadoController extends Controller
      */
     public function index(Treinamento $treinamento): View
     {
+        $this->autorizarTreinamento($treinamento);
+
         $inscritos = $treinamento->inscricoes()
             ->confirmadas()
             ->with('certificado')
@@ -48,6 +51,7 @@ class CertificadoController extends Controller
     public function emitir(Inscricao $inscricao): RedirectResponse
     {
         $treinamento = $inscricao->treinamento;
+        $this->autorizarTreinamento($treinamento);
 
         if (! $treinamento->gera_certificado) {
             return back()->with('erro', 'Este treinamento não está configurado para emitir certificados.');
@@ -70,6 +74,8 @@ class CertificadoController extends Controller
      */
     public function emitirTodos(Treinamento $treinamento): RedirectResponse
     {
+        $this->autorizarTreinamento($treinamento);
+
         if (! $treinamento->gera_certificado) {
             return back()->with('erro', 'Este treinamento não está configurado para emitir certificados.');
         }
@@ -95,8 +101,15 @@ class CertificadoController extends Controller
      */
     public function destroy(Certificado $certificado): RedirectResponse
     {
+        abort_unless($certificado->inscricao->treinamento->user_id === auth()->id(), 403);
+
         $certificado->delete();
 
         return back()->with('sucesso', 'Certificado revogado.');
+    }
+
+    private function autorizarTreinamento(Treinamento $treinamento): void
+    {
+        abort_unless($treinamento->user_id === auth()->id(), 403);
     }
 }

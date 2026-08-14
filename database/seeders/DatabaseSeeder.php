@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Area;
 use App\Models\Inscricao;
 use App\Models\Treinamento;
 use App\Models\User;
@@ -12,16 +13,53 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Administrador padrão (idempotente)
+        // Áreas / setores
+        $areasDados = [
+            ['nome' => 'Atenção à Saúde', 'sigla' => 'SAUDE'],
+            ['nome' => 'Administrativo', 'sigla' => 'ADM'],
+            ['nome' => 'Tecnologia da Informação', 'sigla' => 'TI'],
+            ['nome' => 'Recursos Humanos', 'sigla' => 'RH'],
+        ];
+        $areas = [];
+        foreach ($areasDados as $dados) {
+            $areas[$dados['sigla']] = Area::updateOrCreate(['nome' => $dados['nome']], $dados);
+        }
+
+        // Administrador Geral (super-admin)
         User::updateOrCreate(
             ['email' => 'admin@treinamentos.gov.br'],
             [
-                'name' => 'Administrador',
+                'name' => 'Administrador Geral',
                 'password' => 'admin123',
+                'role' => User::ROLE_ADMIN,
+                'area_id' => null,
+                'ativo' => true,
             ]
         );
 
-        // Treinamentos de exemplo
+        // Gestores de treinamentos
+        $gestorSaude = User::updateOrCreate(
+            ['email' => 'gestor.saude@treinamentos.gov.br'],
+            [
+                'name' => 'Gestor de Saúde',
+                'password' => 'gestor123',
+                'role' => User::ROLE_GESTOR,
+                'area_id' => $areas['SAUDE']->id,
+                'ativo' => true,
+            ]
+        );
+        $gestorAdm = User::updateOrCreate(
+            ['email' => 'gestor.adm@treinamentos.gov.br'],
+            [
+                'name' => 'Gestor Administrativo',
+                'password' => 'gestor123',
+                'role' => User::ROLE_GESTOR,
+                'area_id' => $areas['ADM']->id,
+                'ativo' => true,
+            ]
+        );
+
+        // Treinamentos (com dono)
         $exemplos = [
             [
                 'slug' => 'atendimento-humanizado-ao-cidadao',
@@ -35,6 +73,7 @@ class DatabaseSeeder extends Seeder
                 'vagas' => 40,
                 'dias' => 7,
                 'status' => Treinamento::STATUS_PUBLICADO,
+                'dono' => $gestorSaude->id,
             ],
             [
                 'slug' => 'seguranca-do-paciente',
@@ -48,6 +87,7 @@ class DatabaseSeeder extends Seeder
                 'vagas' => 25,
                 'dias' => 15,
                 'status' => Treinamento::STATUS_PUBLICADO,
+                'dono' => $gestorSaude->id,
             ],
             [
                 'slug' => 'lgpd-na-administracao-publica',
@@ -61,6 +101,7 @@ class DatabaseSeeder extends Seeder
                 'vagas' => null,
                 'dias' => 22,
                 'status' => Treinamento::STATUS_PUBLICADO,
+                'dono' => $gestorAdm->id,
             ],
             [
                 'slug' => 'primeiros-socorros',
@@ -74,6 +115,7 @@ class DatabaseSeeder extends Seeder
                 'vagas' => 30,
                 'dias' => 4,
                 'status' => Treinamento::STATUS_PUBLICADO,
+                'dono' => $gestorSaude->id,
             ],
             [
                 'slug' => 'gestao-de-processos-e-qualidade',
@@ -87,18 +129,21 @@ class DatabaseSeeder extends Seeder
                 'vagas' => 35,
                 'dias' => 30,
                 'status' => Treinamento::STATUS_RASCUNHO,
+                'dono' => $gestorAdm->id,
             ],
         ];
 
         foreach ($exemplos as $dados) {
             $dias = $dados['dias'];
-            unset($dados['dias']);
+            $dono = $dados['dono'];
+            unset($dados['dias'], $dados['dono']);
 
             $inicio = Carbon::now()->addDays($dias)->setTime(9, 0);
 
             Treinamento::updateOrCreate(
                 ['slug' => $dados['slug']],
                 array_merge($dados, [
+                    'user_id' => $dono,
                     'data_inicio' => $inicio,
                     'data_fim' => (clone $inicio)->addHours(min($dados['carga_horaria'], 8)),
                     'inscricoes_ate' => (clone $inicio)->subDays(2)->toDateString(),
@@ -108,7 +153,10 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // Inscrições de exemplo
+        // Treinamentos sem dono (criados antes do controle de acesso) vão para o gestor de saúde
+        Treinamento::whereNull('user_id')->update(['user_id' => $gestorSaude->id]);
+
+        // Inscrições e sessões de exemplo
         $inscricoesExemplo = [
             'atendimento-humanizado-ao-cidadao' => [
                 ['nome' => 'Maria Silva Santos', 'email' => 'maria.santos@exemplo.gov.br', 'orgao' => 'Secretaria de Saúde', 'cargo' => 'Recepcionista', 'status' => Inscricao::STATUS_CONFIRMADA],
@@ -133,7 +181,6 @@ class DatabaseSeeder extends Seeder
                 );
             }
 
-            // Uma sessão de exemplo por treinamento (apenas se ainda não houver)
             if ($treinamento->sessoes()->count() === 0) {
                 $treinamento->sessoes()->create([
                     'titulo' => 'Encontro único',

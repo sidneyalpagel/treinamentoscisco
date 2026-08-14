@@ -20,6 +20,7 @@ class SessaoController extends Controller
     public function painel(): View
     {
         $sessoes = Sessao::query()
+            ->whereHas('treinamento', fn ($q) => $q->doUsuario(auth()->id()))
             ->with('treinamento')
             ->withCount('presencas')
             ->orderByDesc('data')
@@ -34,6 +35,8 @@ class SessaoController extends Controller
      */
     public function index(Treinamento $treinamento): View
     {
+        $this->autorizarTreinamento($treinamento);
+
         $treinamento->load(['sessoes' => fn ($q) => $q->withCount('presencas')]);
         $totalConfirmados = $treinamento->totalConfirmadas();
 
@@ -42,6 +45,8 @@ class SessaoController extends Controller
 
     public function store(Request $request, Treinamento $treinamento): RedirectResponse
     {
+        $this->autorizarTreinamento($treinamento);
+
         $dados = $request->validate([
             'titulo' => ['nullable', 'string', 'max:255'],
             'data' => ['required', 'date'],
@@ -60,6 +65,8 @@ class SessaoController extends Controller
 
     public function destroy(Sessao $sessao): RedirectResponse
     {
+        $this->autorizarSessao($sessao);
+
         $treinamento = $sessao->treinamento;
         $sessao->delete();
 
@@ -73,6 +80,8 @@ class SessaoController extends Controller
      */
     public function toggleChamada(Sessao $sessao): RedirectResponse
     {
+        $this->autorizarSessao($sessao);
+
         $sessao->update(['presenca_aberta' => ! $sessao->presenca_aberta]);
 
         return back()->with('sucesso', $sessao->presenca_aberta
@@ -85,6 +94,8 @@ class SessaoController extends Controller
      */
     public function presenca(Sessao $sessao): View
     {
+        $this->autorizarSessao($sessao);
+
         $sessao->load('treinamento');
 
         $inscritos = $sessao->treinamento
@@ -103,6 +114,7 @@ class SessaoController extends Controller
      */
     public function togglePresenca(Sessao $sessao, Inscricao $inscricao): RedirectResponse
     {
+        $this->autorizarSessao($sessao);
         abort_unless($inscricao->treinamento_id === $sessao->treinamento_id, 404);
 
         $presenca = $sessao->presencas()->where('inscricao_id', $inscricao->id)->first();
@@ -127,6 +139,8 @@ class SessaoController extends Controller
      */
     public function exportarPresenca(Sessao $sessao): StreamedResponse
     {
+        $this->autorizarSessao($sessao);
+
         $sessao->load('treinamento');
         $inscritos = $sessao->treinamento->inscricoes()->confirmadas()->orderBy('nome')->get();
         $presentes = $sessao->presencas()->pluck('registrado_em', 'inscricao_id');
@@ -154,5 +168,15 @@ class SessaoController extends Controller
 
             fclose($saida);
         }, $nomeArquivo, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    private function autorizarTreinamento(Treinamento $treinamento): void
+    {
+        abort_unless($treinamento->user_id === auth()->id(), 403);
+    }
+
+    private function autorizarSessao(Sessao $sessao): void
+    {
+        abort_unless($sessao->treinamento->user_id === auth()->id(), 403);
     }
 }
