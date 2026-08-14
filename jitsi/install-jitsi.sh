@@ -7,14 +7,14 @@
 #
 # Rode como root NA VM do Jitsi Core (não no servidor do portal).
 #
-#   # coloque antes os certificados em /opt/certificados/<DOMAIN>.crt e .key
+#   # coloque antes os certificados em /opt/certificados/{fullchain.pem,cert.key}
 #   sudo DOMAIN=meet.ciscopar.com.br ./install-jitsi.sh
 #
 # Variáveis (env ou jitsi.conf ao lado do script):
 #   DOMAIN           (obrigatório)  FQDN do Jitsi, ex.: meet.ciscopar.com.br
 #   CERT_DIR         (opcional)     Pasta dos certificados. Padrão: /opt/certificados
-#   CERT_FULLCHAIN   (opcional)     Cert + cadeia (PEM). Padrão: <CERT_DIR>/<DOMAIN>.crt
-#   CERT_KEY         (opcional)     Chave privada (PEM). Padrão: <CERT_DIR>/<DOMAIN>.key
+#   CERT_FULLCHAIN   (opcional)     Cert + cadeia (PEM). Padrão: <CERT_DIR>/fullchain.pem
+#   CERT_KEY         (opcional)     Chave privada (PEM). Padrão: <CERT_DIR>/cert.key
 #   LE_EMAIL         (opcional)     Alternativa: Let's Encrypt (só se NÃO houver cert próprio).
 #   JWT_APP_ID       (opcional)     App id do token. Padrão: ciscopar
 #   JWT_APP_SECRET   (opcional)     Segredo do token. Vazio = gera um e mostra no fim.
@@ -33,8 +33,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # --- parâmetros ------------------------------------------------------------
 DOMAIN="${DOMAIN:-}"
 CERT_DIR="${CERT_DIR:-/opt/certificados}"
-CERT_FULLCHAIN="${CERT_FULLCHAIN:-$CERT_DIR/${DOMAIN}.crt}"
-CERT_KEY="${CERT_KEY:-$CERT_DIR/${DOMAIN}.key}"
+CERT_FULLCHAIN="${CERT_FULLCHAIN:-$CERT_DIR/fullchain.pem}"
+CERT_KEY="${CERT_KEY:-$CERT_DIR/cert.key}"
 LE_EMAIL="${LE_EMAIL:-}"
 JWT_APP_ID="${JWT_APP_ID:-ciscopar}"
 JWT_APP_SECRET="${JWT_APP_SECRET:-}"
@@ -148,7 +148,7 @@ elif [ -n "$LE_EMAIL" ]; then
         ok "Certificado Let's Encrypt já existe — mantido."
     fi
 else
-    warn "Sem certificado em ${CERT_DIR} (${DOMAIN}.crt/.key) e sem LE_EMAIL: seguindo self-signed."
+    warn "Sem certificado em ${CERT_DIR} (fullchain.pem/cert.key) e sem LE_EMAIL: seguindo self-signed."
     warn "Coloque os certificados em ${CERT_DIR} e rode o script novamente."
 fi
 

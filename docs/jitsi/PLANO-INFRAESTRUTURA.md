@@ -98,9 +98,9 @@ flowchart LR
   (AD/servidor DNS) → **IP interno da VM Core**. A VM Jibri não precisa de nome/DNS.
 - Portas Jitsi Core (rede interna): **TCP 443** (web), **UDP 10000** (mídia), TCP 4443 (fallback).
 - Jibri → Core: XMPP na rede interna entre as VMs.
-- **TLS: certificado próprio da CISCOPAR** em `/opt/certificados/<DOMAIN>.crt` e `.key`, nas
-  **duas VMs** (Core: aplicado ao nginx; Jibri: instalado na trust store para o Chrome do gravador).
-  Let's Encrypt HTTP-01 **não se aplica** (domínio interno).
+- **TLS: certificado próprio da CISCOPAR** em `/opt/certificados/` nas **duas VMs** —
+  `fullchain.pem` (cert + cadeia) + `cert.key` (chave). Core aplica ao nginx; Jibri instala na
+  trust store para o Chrome do gravador. Let's Encrypt HTTP-01 **não se aplica** (domínio interno).
 
 ## 6. Segurança, JWT e LGPD
 
