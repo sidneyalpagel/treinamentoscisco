@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Treinamento;
 use App\Support\JitsiToken;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Str;
 
 class SalaController extends Controller
 {
@@ -25,7 +24,7 @@ class SalaController extends Controller
 
         if (! $treinamento->temSala()) {
             $treinamento->update([
-                'sala_codigo' => $this->gerarCodigo($treinamento),
+                'sala_codigo' => Treinamento::gerarSalaCodigo($treinamento->titulo),
                 'sala_criada_em' => now(),
             ]);
         }
@@ -55,17 +54,6 @@ class SalaController extends Controller
         $treinamento->update(['sala_codigo' => null, 'sala_criada_em' => null]);
 
         return back()->with('sucesso', 'Sala removida.');
-    }
-
-    private function gerarCodigo(Treinamento $treinamento): string
-    {
-        $base = Str::slug(Str::limit($treinamento->titulo, 30, '')) ?: 'sala';
-
-        do {
-            $codigo = $base.'-'.Str::lower(Str::random(6));
-        } while (Treinamento::where('sala_codigo', $codigo)->exists());
-
-        return $codigo;
     }
 
     private function autorizar(Treinamento $treinamento): void

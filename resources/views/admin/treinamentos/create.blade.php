@@ -14,6 +14,6 @@
 
     <form method="POST" action="{{ route('admin.treinamentos.store') }}">
         @csrf
-        @include('admin.treinamentos._form', ['textoBotao' => 'Cadastrar treinamento'])
+        @include('admin.treinamentos._form', ['textoBotao' => 'Cadastrar treinamento', 'mostrarCriarSala' => true])
     </form>
 @endsection

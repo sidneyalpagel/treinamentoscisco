@@ -69,6 +69,18 @@ class Treinamento extends Model
         return ! blank($this->sala_codigo);
     }
 
+    /** Gera um código de sala único a partir do título. */
+    public static function gerarSalaCodigo(string $titulo): string
+    {
+        $base = Str::slug(Str::limit($titulo, 30, '')) ?: 'sala';
+
+        do {
+            $codigo = $base.'-'.Str::lower(Str::random(6));
+        } while (static::where('sala_codigo', $codigo)->exists());
+
+        return $codigo;
+    }
+
     /**
      * Gera o slug automaticamente a partir do título quando ausente.
      */

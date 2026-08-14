@@ -56,7 +56,7 @@
             <div class="grid gap-5 sm:grid-cols-2">
                 <div>
                     <label for="modalidade" class="block text-sm font-medium text-slate-700 mb-1.5">Modalidade <span class="text-red-500">*</span></label>
-                    <select id="modalidade" name="modalidade" class="{{ $inputBase }} @error('modalidade') {{ $inputErro }} @enderror">
+                    <select id="modalidade" name="modalidade" onchange="toggleSalaOnline()" class="{{ $inputBase }} @error('modalidade') {{ $inputErro }} @enderror">
                         @foreach ($modalidadesDisponiveis as $valor => $rotulo)
                             <option value="{{ $valor }}" @selected(old('modalidade', $treinamento->modalidade) === $valor)>{{ $rotulo }}</option>
                         @endforeach
@@ -87,6 +87,19 @@
                     @error('data_fim') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
             </div>
+
+            @if (! empty($mostrarCriarSala))
+                <div id="sala-online-wrapper" class="pt-1" style="display:none;">
+                    <label class="flex items-start gap-2.5 text-sm text-slate-700 select-none rounded-lg border border-brand-200 bg-brand-50 p-3">
+                        <input type="hidden" name="criar_sala" value="0">
+                        <input type="checkbox" name="criar_sala" value="1" @checked(old('criar_sala', true))
+                               class="mt-0.5 rounded border-slate-300 text-brand-700 focus:ring-brand-500/30">
+                        <span class="text-brand-900">Criar sala de videoconferência
+                            <span class="block text-xs text-brand-800/80">Gera a sala online e os links (moderador e participantes) desta reunião agendada ao salvar.</span>
+                        </span>
+                    </label>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -146,3 +159,13 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleSalaOnline() {
+        var wrapper = document.getElementById('sala-online-wrapper');
+        if (!wrapper) return;
+        var modalidade = document.getElementById('modalidade').value;
+        wrapper.style.display = (modalidade === 'online' || modalidade === 'hibrido') ? '' : 'none';
+    }
+    toggleSalaOnline();
+</script>

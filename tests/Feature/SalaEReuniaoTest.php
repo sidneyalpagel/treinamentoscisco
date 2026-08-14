@@ -43,6 +43,41 @@ class SalaEReuniaoTest extends TestCase
         $this->assertFalse($treinamento->fresh()->temSala());
     }
 
+    public function test_criar_treinamento_online_marcado_ja_cria_a_sala(): void
+    {
+        $this->configurarJitsi();
+        $gestor = User::factory()->create();
+
+        $resp = $this->actingAs($gestor)->post(route('admin.treinamentos.store'), [
+            'titulo' => 'Treino Online',
+            'modalidade' => 'online',
+            'status' => 'publicado',
+            'data_inicio' => now()->addDay()->format('Y-m-d\TH:i'),
+            'criar_sala' => '1',
+        ]);
+
+        $treinamento = Treinamento::first();
+        $this->assertNotNull($treinamento);
+        $this->assertTrue($treinamento->temSala());
+        $resp->assertRedirect(route('admin.treinamentos.show', $treinamento));
+    }
+
+    public function test_treinamento_presencial_nao_cria_sala_mesmo_marcado(): void
+    {
+        $this->configurarJitsi();
+        $gestor = User::factory()->create();
+
+        $this->actingAs($gestor)->post(route('admin.treinamentos.store'), [
+            'titulo' => 'Treino Presencial',
+            'modalidade' => 'presencial',
+            'status' => 'rascunho',
+            'data_inicio' => now()->addDay()->format('Y-m-d\TH:i'),
+            'criar_sala' => '1',
+        ]);
+
+        $this->assertFalse(Treinamento::first()->temSala());
+    }
+
     public function test_moderador_entra_na_sala_com_jwt(): void
     {
         $this->configurarJitsi();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TreinamentoRequest;
 use App\Models\Treinamento;
+use App\Support\JitsiToken;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -51,9 +52,24 @@ class TreinamentoController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
+        $mensagem = 'Treinamento cadastrado com sucesso.';
+
+        // Cria a sala de videoconferência quando pedido (online/híbrido + Jitsi configurado).
+        if ($request->boolean('criar_sala') && $treinamento->modalidadeOnline()) {
+            if (JitsiToken::configurado()) {
+                $treinamento->update([
+                    'sala_codigo' => Treinamento::gerarSalaCodigo($treinamento->titulo),
+                    'sala_criada_em' => now(),
+                ]);
+                $mensagem = 'Treinamento cadastrado e sala de videoconferência criada.';
+            } else {
+                $mensagem = 'Treinamento cadastrado. Configure a Videoconferência (Jitsi) em Configurações para criar a sala.';
+            }
+        }
+
         return redirect()
             ->route('admin.treinamentos.show', $treinamento)
-            ->with('sucesso', 'Treinamento cadastrado com sucesso.');
+            ->with('sucesso', $mensagem);
     }
 
     public function show(Treinamento $treinamento): View
