@@ -2,9 +2,14 @@
 
 @php
     $mapa = [
+        // Treinamentos
         'publicado' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
         'rascunho'  => 'bg-amber-50 text-amber-700 ring-amber-600/20',
         'encerrado' => 'bg-slate-100 text-slate-600 ring-slate-500/20',
+        // Inscrições
+        'confirmada' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+        'pendente'   => 'bg-amber-50 text-amber-700 ring-amber-600/20',
+        'cancelada'  => 'bg-red-50 text-red-700 ring-red-600/20',
     ];
     $classe = $mapa[$status] ?? 'bg-slate-100 text-slate-600 ring-slate-500/20';
 @endphp

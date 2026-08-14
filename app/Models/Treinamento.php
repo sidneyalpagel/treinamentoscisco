@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Treinamento extends Model
@@ -79,6 +80,15 @@ class Treinamento extends Model
     }
 
     /* --------------------------------------------------------------------- */
+    /* Relações                                                              */
+    /* --------------------------------------------------------------------- */
+
+    public function inscricoes(): HasMany
+    {
+        return $this->hasMany(Inscricao::class);
+    }
+
+    /* --------------------------------------------------------------------- */
     /* Escopos                                                               */
     /* --------------------------------------------------------------------- */
 
@@ -131,7 +141,37 @@ class Treinamento extends Model
     }
 
     /**
-     * As inscrições estão abertas? (publicado, permite inscrição e dentro do prazo)
+     * Número de inscrições confirmadas (usa o count carregado quando disponível).
+     */
+    public function totalConfirmadas(): int
+    {
+        return $this->inscricoes()->confirmadas()->count();
+    }
+
+    /**
+     * Vagas restantes. Retorna null quando ilimitado.
+     */
+    public function vagasRestantes(): ?int
+    {
+        if (is_null($this->vagas)) {
+            return null;
+        }
+
+        return max(0, $this->vagas - $this->totalConfirmadas());
+    }
+
+    /**
+     * Há vagas disponíveis? (sempre verdadeiro quando ilimitado)
+     */
+    public function temVagas(): bool
+    {
+        $restantes = $this->vagasRestantes();
+
+        return is_null($restantes) || $restantes > 0;
+    }
+
+    /**
+     * As inscrições estão abertas? (publicado, permite inscrição, dentro do prazo e com vagas)
      */
     public function inscricoesAbertas(): bool
     {
@@ -139,11 +179,11 @@ class Treinamento extends Model
             return false;
         }
 
-        if ($this->inscricoes_ate && $this->inscricoes_ate->isPast()) {
+        if ($this->inscricoes_ate && $this->inscricoes_ate->endOfDay()->isPast()) {
             return false;
         }
 
-        return true;
+        return $this->temVagas();
     }
 
     /**

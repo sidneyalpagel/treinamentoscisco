@@ -21,8 +21,8 @@
             $cards = [
                 ['rotulo' => 'Total de treinamentos', 'valor' => $metricas['total'], 'cor' => 'brand'],
                 ['rotulo' => 'Publicados', 'valor' => $metricas['publicados'], 'cor' => 'emerald'],
-                ['rotulo' => 'Rascunhos', 'valor' => $metricas['rascunhos'], 'cor' => 'amber'],
-                ['rotulo' => 'Próximos', 'valor' => $metricas['proximos'], 'cor' => 'sky'],
+                ['rotulo' => 'Inscrições', 'valor' => $metricas['inscricoes'], 'cor' => 'sky'],
+                ['rotulo' => 'Próximos', 'valor' => $metricas['proximos'], 'cor' => 'amber'],
             ];
         @endphp
         @foreach ($cards as $card)

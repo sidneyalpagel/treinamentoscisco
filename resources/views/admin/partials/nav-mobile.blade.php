@@ -2,6 +2,7 @@
     $itensMobile = [
         ['rota' => 'admin.dashboard', 'ativo' => 'admin.dashboard', 'rotulo' => 'Painel'],
         ['rota' => 'admin.treinamentos.index', 'ativo' => 'admin.treinamentos.*', 'rotulo' => 'Treinamentos'],
+        ['rota' => 'admin.inscricoes.index', 'ativo' => 'admin.inscricoes.*', 'rotulo' => 'Inscrições'],
     ];
 @endphp
 

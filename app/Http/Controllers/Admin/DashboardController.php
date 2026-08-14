@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Inscricao;
 use App\Models\Treinamento;
 use Illuminate\View\View;
 
@@ -13,7 +14,7 @@ class DashboardController extends Controller
         $metricas = [
             'total' => Treinamento::count(),
             'publicados' => Treinamento::where('status', Treinamento::STATUS_PUBLICADO)->count(),
-            'rascunhos' => Treinamento::where('status', Treinamento::STATUS_RASCUNHO)->count(),
+            'inscricoes' => Inscricao::count(),
             'proximos' => Treinamento::proximos()->count(),
         ];
 

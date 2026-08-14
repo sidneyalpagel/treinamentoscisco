@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Inscricao;
 use App\Models\Treinamento;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -105,6 +106,32 @@ class DatabaseSeeder extends Seeder
                     'gera_certificado' => true,
                 ])
             );
+        }
+
+        // Inscrições de exemplo
+        $inscricoesExemplo = [
+            'atendimento-humanizado-ao-cidadao' => [
+                ['nome' => 'Maria Silva Santos', 'email' => 'maria.santos@exemplo.gov.br', 'orgao' => 'Secretaria de Saúde', 'cargo' => 'Recepcionista', 'status' => Inscricao::STATUS_CONFIRMADA],
+                ['nome' => 'João Pereira Souza', 'email' => 'joao.souza@exemplo.gov.br', 'orgao' => 'Secretaria de Saúde', 'cargo' => 'Atendente', 'status' => Inscricao::STATUS_CONFIRMADA],
+                ['nome' => 'Ana Carolina Oliveira', 'email' => 'ana.oliveira@exemplo.gov.br', 'orgao' => 'Administração Geral', 'cargo' => 'Assistente Administrativo', 'status' => Inscricao::STATUS_PENDENTE],
+            ],
+            'primeiros-socorros' => [
+                ['nome' => 'Carlos Eduardo Lima', 'email' => 'carlos.lima@exemplo.gov.br', 'orgao' => 'Manutenção', 'cargo' => 'Brigadista', 'status' => Inscricao::STATUS_CONFIRMADA],
+                ['nome' => 'Fernanda Costa', 'email' => 'fernanda.costa@exemplo.gov.br', 'orgao' => 'Recursos Humanos', 'cargo' => 'Analista', 'status' => Inscricao::STATUS_CONFIRMADA],
+            ],
+        ];
+
+        foreach ($inscricoesExemplo as $slug => $pessoas) {
+            $treinamento = Treinamento::where('slug', $slug)->first();
+            if (! $treinamento) {
+                continue;
+            }
+            foreach ($pessoas as $pessoa) {
+                Inscricao::updateOrCreate(
+                    ['treinamento_id' => $treinamento->id, 'email' => $pessoa['email']],
+                    $pessoa
+                );
+            }
         }
     }
 }

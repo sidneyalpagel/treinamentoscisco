@@ -85,6 +85,32 @@
                 </div>
             </div>
 
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="font-semibold text-slate-800 mb-4">Inscrições</h2>
+                @php
+                    $totalInscritos = $treinamento->inscricoes()->count();
+                    $confirmados = $treinamento->totalConfirmadas();
+                @endphp
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="rounded-lg bg-slate-50 p-3 text-center">
+                        <div class="text-2xl font-bold text-slate-800">{{ $totalInscritos }}</div>
+                        <div class="text-xs text-slate-500">Total</div>
+                    </div>
+                    <div class="rounded-lg bg-emerald-50 p-3 text-center">
+                        <div class="text-2xl font-bold text-emerald-700">{{ $confirmados }}</div>
+                        <div class="text-xs text-emerald-600">Confirmadas</div>
+                    </div>
+                </div>
+                @if (! is_null($treinamento->vagas))
+                    <p class="text-sm text-slate-500 mb-4">{{ $treinamento->vagasRestantes() }} de {{ $treinamento->vagas }} vagas disponíveis.</p>
+                @endif
+                <a href="{{ route('admin.inscricoes.index', ['treinamento' => $treinamento->id]) }}"
+                   class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
+                    Gerenciar inscrições
+                </a>
+            </div>
+
             <div class="rounded-xl border border-red-200 bg-white p-6 shadow-sm">
                 <h2 class="font-semibold text-slate-800 mb-1">Remover treinamento</h2>
                 <p class="text-sm text-slate-500 mb-4">Esta ação não poderá ser desfeita.</p>
