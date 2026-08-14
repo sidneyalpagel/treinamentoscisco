@@ -67,6 +67,20 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# 2b. Isenta o recorder do token_verification na conference.
+#     Sem isso, em deployments com JWT o Jibri autentica mas é BARRADO ao
+#     entrar na sala ("Token nil not allowed to join") e a gravação falha.
+#     O mod_token_verification isenta admins ou domínios em token_verification_allowlist.
+# ---------------------------------------------------------------------------
+if ! grep -q "token_verification_allowlist" "$PROSODY_CFG"; then
+    log "Isentando o recorder do token_verification na conference..."
+    sed -i "/Component \"conference.${DOMAIN}\" \"muc\"/a\\    token_verification_allowlist = { \"recorder.${DOMAIN}\" }" "$PROSODY_CFG"
+    ok "recorder adicionado ao token_verification_allowlist."
+else
+    ok "token_verification_allowlist já configurado."
+fi
+
+# ---------------------------------------------------------------------------
 # 3. jitsi-meet: liga gravação em arquivo + domínio oculto
 # ---------------------------------------------------------------------------
 if ! grep -q "enable-recording-core.sh" "$MEET_CFG"; then
