@@ -84,6 +84,20 @@ class SalaEReuniaoTest extends TestCase
         $resp->assertRedirect(route('admin.reunioes.show', $reuniao));
     }
 
+    public function test_gestor_cria_reuniao_imediata_sem_data(): void
+    {
+        $gestor = User::factory()->create();
+
+        $resp = $this->actingAs($gestor)->post(route('admin.reunioes.agora'), []);
+
+        $reuniao = Reuniao::first();
+        $this->assertNotNull($reuniao);
+        $this->assertNotEmpty($reuniao->sala_codigo);
+        $this->assertNotNull($reuniao->data_inicio);
+        $this->assertSame($gestor->id, $reuniao->user_id);
+        $resp->assertRedirect(route('admin.reunioes.show', $reuniao));
+    }
+
     public function test_gestor_nao_acessa_reuniao_de_outro(): void
     {
         $dono = User::factory()->create();

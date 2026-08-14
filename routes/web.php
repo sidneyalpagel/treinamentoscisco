@@ -76,6 +76,7 @@ Route::middleware(['auth', 'role:gestor'])
         Route::resource('treinamentos', TreinamentoController::class);
 
         // Reuniões avulsas
+        Route::post('reunioes/agora', [ReuniaoController::class, 'agora'])->name('reunioes.agora');
         Route::get('reunioes/{reuniao}/entrar', [ReuniaoController::class, 'entrar'])->name('reunioes.entrar');
         Route::resource('reunioes', ReuniaoController::class)->parameters(['reunioes' => 'reuniao']);
 

@@ -13,6 +13,6 @@
     </div>
     <form method="POST" action="{{ route('admin.reunioes.store') }}">
         @csrf
-        @include('admin.reunioes._form', ['textoBotao' => 'Criar reunião'])
+        @include('admin.reunioes._form', ['textoBotao' => 'Agendar reunião', 'permitirAgora' => true])
     </form>
 @endsection

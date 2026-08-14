@@ -29,8 +29,18 @@
         </div>
     </div>
 
-    <div class="flex gap-2 pt-2">
+    <div class="flex flex-wrap items-center gap-2 pt-2">
         <button type="submit" class="rounded-lg bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 transition-colors">{{ $textoBotao ?? 'Salvar' }}</button>
+        @if (! empty($permitirAgora))
+            <button type="submit" formaction="{{ route('admin.reunioes.agora') }}" formnovalidate
+                    class="inline-flex items-center gap-2 rounded-lg border border-emerald-600 px-4 py-2.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"/></svg>
+                Iniciar agora
+            </button>
+        @endif
         <a href="{{ route('admin.reunioes.index') }}" class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Cancelar</a>
     </div>
+    @if (! empty($permitirAgora))
+        <p class="text-xs text-slate-500">“Iniciar agora” cria a reunião na hora, sem precisar de data.</p>
+    @endif
 </div>

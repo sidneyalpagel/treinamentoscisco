@@ -37,6 +37,31 @@ class ReuniaoController extends Controller
         return redirect()->route('admin.reunioes.show', $reuniao)->with('sucesso', 'Reunião criada.');
     }
 
+    /** Cria uma reunião imediata (sem agendamento) começando agora. */
+    public function agora(Request $request): RedirectResponse
+    {
+        $dados = $request->validate([
+            'titulo' => ['nullable', 'string', 'max:255'],
+            'descricao' => ['nullable', 'string'],
+        ]);
+
+        $titulo = filled($dados['titulo'] ?? null)
+            ? $dados['titulo']
+            : 'Reunião de '.now()->format('d/m/Y H:i');
+
+        $reuniao = new Reuniao([
+            'titulo' => $titulo,
+            'descricao' => $dados['descricao'] ?? null,
+            'data_inicio' => now(),
+        ]);
+        $reuniao->user_id = $request->user()->id;
+        $reuniao->sala_codigo = Reuniao::gerarSalaCodigo($titulo);
+        $reuniao->save();
+
+        return redirect()->route('admin.reunioes.show', $reuniao)
+            ->with('sucesso', 'Reunião criada. Clique em "Entrar na sala" para começar.');
+    }
+
     public function show(Reuniao $reuniao): View
     {
         $this->autorizar($reuniao);
