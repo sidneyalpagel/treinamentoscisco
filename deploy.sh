@@ -2,10 +2,13 @@
 #
 # deploy.sh — Implantação da Plataforma de Treinamentos em servidores HestiaCP
 # ---------------------------------------------------------------------------
-# Fluxo de uso:
-#     git clone https://github.com/sidneyalpagel/treinamentoscisco.git laravel
-#     cd laravel
-#     sudo HESTIA_USER=ciscopar DOMAIN=treinamentos.ciscopar.com.br ./deploy.sh
+# Fluxo de uso (recomendado — dentro do domínio, por causa do open_basedir do Hestia):
+#     mkdir -p /home/USUARIO/web/DOMINIO/private
+#     git clone https://github.com/sidneyalpagel/treinamentoscisco.git /home/USUARIO/web/DOMINIO/private/laravel
+#     cd /home/USUARIO/web/DOMINIO/private/laravel
+#     sudo HESTIA_USER=USUARIO DOMAIN=DOMINIO ./deploy.sh
+#
+# (Se clonar em outro lugar, o script realoca sozinho para <domínio>/private/laravel.)
 #
 # O script roda DENTRO do próprio repositório clonado e cuida de TUDO:
 #   0. Instala as dependências que faltarem (composer e Node.js/npm)
@@ -95,6 +98,28 @@ die()  { echo -e "${c_red}✗ $*${c_reset}" >&2; exit 1; }
 
 IS_ROOT=false
 [ "$(id -u)" -eq 0 ] && IS_ROOT=true
+
+# ---------------------------------------------------------------------------
+# open_basedir do Hestia: o PHP só roda DENTRO do diretório do domínio. Se a app
+# foi clonada fora (ex.: /home/user/laravel), realoca para <domínio>/private/laravel
+# e re-executa a partir de lá. Evita o erro 500 "vendor/autoload.php Operation not
+# permitted".
+# ---------------------------------------------------------------------------
+APP_TARGET="${DOMAIN_DIR}/private/laravel"
+case "${APP_DIR}/" in
+    "${DOMAIN_DIR}"/*) : ;;   # já está dentro do diretório do domínio — ok
+    *)
+        if [ -e "$APP_TARGET" ]; then
+            die "A app precisa ficar em ${APP_TARGET} (open_basedir do Hestia), e ele já existe. Rode o deploy de lá: cd ${APP_TARGET} && sudo HESTIA_USER=${HESTIA_USER} DOMAIN=${DOMAIN} ./deploy.sh"
+        fi
+        log "open_basedir do Hestia: realocando a app de ${APP_DIR} para ${APP_TARGET}..."
+        mkdir -p "${DOMAIN_DIR}/private"
+        cp -a "$APP_DIR" "$APP_TARGET"
+        $IS_ROOT && chown -R "$HESTIA_USER":"$HESTIA_USER" "$APP_TARGET"
+        ok "App copiada — continuando a partir de ${APP_TARGET} (a cópia antiga em ${APP_DIR} pode ser removida)."
+        exec env APP_DIR="$APP_TARGET" bash "$APP_TARGET/deploy.sh"
+        ;;
+esac
 
 # Executa um comando dentro de APP_DIR como o usuário do domínio (mantém o dono correto)
 run_app() {

@@ -63,13 +63,20 @@ npm run dev                    # assets em modo desenvolvimento (hot reload)
 
 Pré-requisitos (uma vez, pelo painel Hestia): usuário do painel, domínio web, versão do PHP do domínio e um banco MySQL/MariaDB criado.
 
+> ⚠️ **Hestia + `open_basedir`:** o PHP só roda dentro do diretório do domínio. Por isso a app fica em `<domínio>/private/laravel` — clonar fora dali gera erro 500 (`vendor/autoload.php Operation not permitted`). O `deploy.sh` realoca sozinho se você clonar em outro lugar, mas o ideal é já clonar no lugar certo:
+
 ```bash
-git clone https://github.com/sidneyalpagel/treinamentoscisco.git laravel
-cd laravel
-sudo HESTIA_USER=ciscopar DOMAIN=treinamentos.ciscopar.com.br ./deploy.sh
+USER=sistemas; DOMINIO=treinamentos.ciscopar.com.br
+mkdir -p /home/$USER/web/$DOMINIO/private
+git clone https://github.com/sidneyalpagel/treinamentoscisco.git /home/$USER/web/$DOMINIO/private/laravel
+cd /home/$USER/web/$DOMINIO/private/laravel
+sudo HESTIA_USER=$USER DOMAIN=$DOMINIO \
+  DB_DATABASE=sistemas_laravel DB_USERNAME=sistemas_lara DB_PASSWORD='...' ./deploy.sh
 ```
 
 O [`deploy.sh`](deploy.sh) é idempotente e cuida de tudo: instala dependências que faltarem (composer, Node.js), configura o `.env` (pede as credenciais do banco na 1ª vez), instala pacotes PHP, compila os assets, roda migrations, recria caches, ajusta permissões, aponta o `public_html` para `public/` e recarrega o PHP-FPM. Para atualizações, basta rodar `./deploy.sh` de novo. Configuração opcional via `deploy.conf` (veja `deploy.conf.example`).
+
+> **SSL:** com o domínio no Cloudflare em modo *proxied*, use o certificado wildcard no origin (`v-add-web-domain-ssl`) + Cloudflare em **Full (strict)**. O admin inicial (sem SMTP ainda) é criado manualmente: `sudo -u USER php artisan tinker --execute="App\Models\User::create(['name'=>'Admin','email'=>'...','password'=>'...','role'=>'admin','ativo'=>true]);"` — depois ele cadastra o SMTP e convida os gestores pelo painel.
 
 ## Estrutura (base atual)
 
