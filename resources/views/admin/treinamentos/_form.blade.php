@@ -56,14 +56,14 @@
             <div class="grid gap-5 sm:grid-cols-2">
                 <div>
                     <label for="modalidade" class="block text-sm font-medium text-slate-700 mb-1.5">Modalidade <span class="text-red-500">*</span></label>
-                    <select id="modalidade" name="modalidade" onchange="toggleSalaOnline()" class="{{ $inputBase }} @error('modalidade') {{ $inputErro }} @enderror">
+                    <select id="modalidade" name="modalidade" onchange="aoMudarModalidade()" class="{{ $inputBase }} @error('modalidade') {{ $inputErro }} @enderror">
                         @foreach ($modalidadesDisponiveis as $valor => $rotulo)
                             <option value="{{ $valor }}" @selected(old('modalidade', $treinamento->modalidade) === $valor)>{{ $rotulo }}</option>
                         @endforeach
                     </select>
                     @error('modalidade') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
-                <div>
+                <div id="local-wrapper">
                     <label for="local" class="block text-sm font-medium text-slate-700 mb-1.5">Local</label>
                     <input id="local" name="local" value="{{ old('local', $treinamento->local) }}"
                            class="{{ $inputBase }} @error('local') {{ $inputErro }} @enderror" placeholder="Ex.: Auditório / Link da sala">
@@ -161,11 +161,16 @@
 </div>
 
 <script>
-    function toggleSalaOnline() {
-        var wrapper = document.getElementById('sala-online-wrapper');
-        if (!wrapper) return;
+    function aoMudarModalidade() {
         var modalidade = document.getElementById('modalidade').value;
-        wrapper.style.display = (modalidade === 'online' || modalidade === 'hibrido') ? '' : 'none';
+
+        // opção de criar sala: só em Online/Híbrido
+        var sala = document.getElementById('sala-online-wrapper');
+        if (sala) sala.style.display = (modalidade === 'online' || modalidade === 'hibrido') ? '' : 'none';
+
+        // campo Local: escondido quando totalmente Online (mantido em Presencial/Híbrido)
+        var local = document.getElementById('local-wrapper');
+        if (local) local.style.display = (modalidade === 'online') ? 'none' : '';
     }
-    toggleSalaOnline();
+    aoMudarModalidade();
 </script>
