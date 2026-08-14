@@ -131,8 +131,11 @@ Mudanças no portal (baixo impacto de carga — só gera links/tokens e registra
 - [x] **Acesso externo (1 IP público):** proxy nginx no HestiaCP (`jitsi/hestia/`) para o 443 +
       DNAT de UDP 10000 / TCP 4443 direto para a VM + NAT harvester do JVB + Cloudflare DNS-only.
       Ver `jitsi/hestia/README.md`.
-- [ ] **Fase 2 — Gravação:** no Core `jitsi/enable-recording-core.sh`; na VM Jibri
-      `jitsi/install-jibri.sh`; `jitsi/finalize.sh` envia o MP4 ao MinIO e chama o webhook do portal.
+- [x] **Fase 2 — Gravação:** `enable-recording-core.sh` (Core) + `install-jibri.sh` (VM Jibri).
+      **Concluída** — grava `.mp4` em `/srv/recordings`. Travas resolvidas: detector jibri no
+      Jicofo; módulo Lua `inspect` no 5.4; `token_verification_allowlist` para o recorder (JWT).
+- [ ] **Fase 2b — Armazenamento:** `jitsi/finalize.sh` envia o MP4 ao MinIO e chama o webhook do
+      portal (depende do endpoint da Fase 3). Configurar `/etc/jitsi/jibri/finalize.env` + MinIO.
 
 ### Scripts (em `jitsi/`)
 
