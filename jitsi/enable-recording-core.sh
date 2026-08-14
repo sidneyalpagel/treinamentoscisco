@@ -87,11 +87,13 @@ fi
 # ---------------------------------------------------------------------------
 # 4. Jicofo: aponta para a brewery do Jibri
 # ---------------------------------------------------------------------------
-if ! grep -q "brewery-jid" "$JICOFO_CFG"; then
+# Atenção: o jicofo.conf já tem um brewery-jid (o do JVB/bridge). Por isso a
+# guarda precisa ser específica do bloco jibri, senão o bloco nunca é adicionado.
+if ! grep -qE "jibri[[:space:]]*\{" "$JICOFO_CFG"; then
     log "Configurando a brewery do Jibri no Jicofo..."
     cat >> "$JICOFO_CFG" <<EOF
 
-// Jibri — adicionado por enable-recording-core.sh
+// jibri-brewery (enable-recording-core)
 jicofo {
   jibri {
     brewery-jid = "JibriBrewery@internal.auth.${DOMAIN}"
@@ -99,9 +101,9 @@ jicofo {
   }
 }
 EOF
-    ok "Jicofo configurado."
+    ok "Jicofo configurado (brewery do Jibri)."
 else
-    ok "Jicofo já aponta para a brewery."
+    ok "Jicofo já tem a brewery do Jibri."
 fi
 
 # ---------------------------------------------------------------------------
