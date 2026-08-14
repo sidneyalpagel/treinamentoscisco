@@ -11,17 +11,7 @@
 
     {{-- Barra superior --}}
     <div class="bg-brand-900 text-brand-100 text-sm">
-        <div class="mx-auto max-w-7xl px-4 py-2 flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-5">
-                <span class="inline-flex items-center gap-1.5">
-                    <svg class="w-4 h-4 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
-                    contato@treinamentos.gov.br
-                </span>
-                <span class="hidden sm:inline-flex items-center gap-1.5">
-                    <svg class="w-4 h-4 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
-                    (00) 0000-0000
-                </span>
-            </div>
+        <div class="mx-auto max-w-7xl px-4 py-2 flex flex-wrap items-center justify-end gap-2">
             <div class="flex items-center gap-4">
                 <a href="{{ route('agenda') }}" class="hover:text-white transition-colors">Agenda</a>
                 <a href="{{ route('certificados.validar') }}" class="hidden sm:inline hover:text-white transition-colors">Validar certificado</a>
@@ -35,18 +25,29 @@
 
     {{-- Cabeçalho --}}
     <header class="bg-white border-b border-slate-200 shadow-sm">
-        <div class="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between gap-6">
-            <a href="{{ route('home') }}" class="flex items-center gap-3">
-                <span class="grid place-items-center w-11 h-11 rounded-lg bg-brand-800 text-white">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"/></svg>
-                </span>
-                <span class="leading-tight">
-                    <span class="block text-lg font-bold text-brand-800 tracking-tight">Plataforma de Treinamentos</span>
-                    <span class="block text-xs text-slate-500">Capacitação e desenvolvimento</span>
-                </span>
+        <div class="mx-auto max-w-7xl px-4 py-4 grid grid-cols-2 md:grid-cols-3 items-center gap-6">
+            {{-- Esquerda: logo CISCOPAR (usa a imagem quando disponível; emblema como fallback) --}}
+            <a href="{{ route('home') }}" class="flex items-center gap-3 justify-self-start">
+                @if (file_exists(public_path('images/ciscopar-logo.png')))
+                    <img src="{{ asset('images/ciscopar-logo.png') }}" alt="CISCOPAR" class="h-11 w-auto">
+                @else
+                    <span class="grid place-items-center w-11 h-11 rounded-lg bg-brand-800 text-white">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"/></svg>
+                    </span>
+                    <span class="leading-tight md:hidden">
+                        <span class="block text-base font-bold text-brand-800 tracking-tight">Plataforma de Treinamentos</span>
+                    </span>
+                @endif
             </a>
 
-            <nav class="hidden md:flex items-center gap-1">
+            {{-- Centro: título da plataforma --}}
+            <a href="{{ route('home') }}" class="hidden md:block text-center leading-tight justify-self-center">
+                <span class="block text-lg font-bold text-brand-800 tracking-tight">Plataforma de Treinamentos</span>
+                <span class="block text-xs text-slate-500">Capacitação e desenvolvimento</span>
+            </a>
+
+            {{-- Direita: navegação --}}
+            <nav class="hidden md:flex items-center justify-end gap-1 justify-self-end">
                 @php($navItens = [['home', 'Início'], ['agenda', 'Agenda']])
                 @foreach ($navItens as [$rota, $rotulo])
                     <a href="{{ route($rota) }}"
@@ -72,7 +73,7 @@
 
     {{-- Rodapé --}}
     <footer class="mt-16 bg-brand-900 text-brand-100">
-        <div class="mx-auto max-w-7xl px-4 py-10 grid gap-8 md:grid-cols-3">
+        <div class="mx-auto max-w-7xl px-4 py-10 grid gap-8 md:grid-cols-2">
             <div>
                 <div class="flex items-center gap-2 text-white font-semibold text-lg">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342"/></svg>
@@ -89,13 +90,6 @@
                     <li><a href="{{ route('agenda') }}" class="hover:text-white transition-colors">Agenda de treinamentos</a></li>
                     <li><a href="{{ route('certificados.validar') }}" class="hover:text-white transition-colors">Validar certificado</a></li>
                     <li><a href="{{ route('login') }}" class="hover:text-white transition-colors">Área do administrador</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-white font-semibold mb-3">Contato</h3>
-                <ul class="space-y-2 text-sm text-brand-200/90">
-                    <li>contato@treinamentos.gov.br</li>
-                    <li>(00) 0000-0000</li>
                 </ul>
             </div>
         </div>
