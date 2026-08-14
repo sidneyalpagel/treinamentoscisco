@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\TreinamentoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CertificadoPublicoController;
 use App\Http\Controllers\Gestao\AreaController;
+use App\Http\Controllers\Gestao\ConfiguracaoController;
 use App\Http\Controllers\Gestao\DashboardController as GestaoDashboardController;
 use App\Http\Controllers\Gestao\UsuarioController;
 use App\Http\Controllers\PresencaController;
@@ -93,4 +94,9 @@ Route::middleware(['auth', 'role:admin'])
         Route::resource('usuarios', UsuarioController::class)->except(['show']);
         Route::patch('usuarios/{usuario}/senha', [UsuarioController::class, 'redefinirSenha'])->name('usuarios.senha');
         Route::patch('usuarios/{usuario}/status', [UsuarioController::class, 'alternarStatus'])->name('usuarios.status');
+
+        // Configurações da plataforma (SMTP)
+        Route::get('configuracoes', [ConfiguracaoController::class, 'edit'])->name('configuracoes.edit');
+        Route::put('configuracoes', [ConfiguracaoController::class, 'update'])->name('configuracoes.update');
+        Route::post('configuracoes/testar', [ConfiguracaoController::class, 'testar'])->name('configuracoes.testar');
     });
