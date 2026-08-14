@@ -98,9 +98,10 @@ flowchart LR
   (AD/servidor DNS) → **IP interno da VM Core**. A VM Jibri não precisa de nome/DNS.
 - Portas Jitsi Core (rede interna): **TCP 443** (web), **UDP 10000** (mídia), TCP 4443 (fallback).
 - Jibri → Core: XMPP na rede interna entre as VMs.
-- **TLS: certificado próprio da CISCOPAR** em `/opt/certificados/` nas **duas VMs** —
-  `fullchain.pem` (cert + cadeia) + `cert.key` (chave). Core aplica ao nginx; Jibri instala na
-  trust store para o Chrome do gravador. Let's Encrypt HTTP-01 **não se aplica** (domínio interno).
+- **TLS: certificado Let's Encrypt wildcard `*.ciscopar.com.br`** (ECDSA), publicamente confiável,
+  em `/opt/certificados/` na **Core** — `fullchain.pem` (cert + cadeia) + `cert.key` (chave),
+  aplicados ao nginx. Como é cert público, o Chrome do Jibri já confia nativamente (sem trust store).
+  Renovação a cada ~90 dias (DNS-01): recopiar os arquivos e recarregar o nginx.
 
 ## 6. Segurança, JWT e LGPD
 
