@@ -126,8 +126,11 @@ Mudanças no portal (baixo impacto de carga — só gera links/tokens e registra
 
 - [ ] **Fase 0 — Piloto de validação (grátis):** integrar `meet.jit.si` no app (sala por sessão +
       botão "Entrar") só para validar o fluxo de produto. *Sem infra.*
-- [ ] **Fase 1 — VM Jitsi Core:** `jitsi/install-jitsi.sh` (Jitsi Meet + Prosody + Jicofo + JVB +
-      TLS + JWT) em Ubuntu 24.04; apontar DNS; primeiro teste de reunião.
+- [x] **Fase 1 — VM Jitsi Core:** `jitsi/install-jitsi.sh` (Jitsi Meet + Prosody + Jicofo + JVB +
+      TLS + JWT) em Ubuntu 24.04. **Concluída** — funciona interno e externo.
+- [x] **Acesso externo (1 IP público):** proxy nginx no HestiaCP (`jitsi/hestia/`) para o 443 +
+      DNAT de UDP 10000 / TCP 4443 direto para a VM + NAT harvester do JVB + Cloudflare DNS-only.
+      Ver `jitsi/hestia/README.md`.
 - [ ] **Fase 2 — Gravação:** no Core `jitsi/enable-recording-core.sh`; na VM Jibri
       `jitsi/install-jibri.sh`; `jitsi/finalize.sh` envia o MP4 ao MinIO e chama o webhook do portal.
 
