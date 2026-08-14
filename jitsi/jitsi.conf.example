@@ -38,3 +38,12 @@ JIBRI_RECORDER_PASS=
 # Onde o Jibri grava os MP4 antes do finalize.
 RECORDINGS_DIR=/srv/recordings
 
+# --- Integração da gravação com o portal (gravação → e-mail) ---------------
+# Segredo compartilhado: MESMO valor cadastrado no portal (Configurações →
+# Gravação → "segredo de gravação"). Gere com: openssl rand -hex 24
+GRAVACAO_SECRET=
+# URL do webhook do portal:
+PORTAL_WEBHOOK=https://treinamentos.ciscopar.com.br/webhooks/gravacao
+# Porta do serviço de arquivos do Jibri (rede interna; o portal busca aqui):
+REC_PORT=8090
+

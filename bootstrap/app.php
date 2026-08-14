@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
         ]);
+
+        // Webhook do Jibri: sem sessão/CSRF (autenticado por bearer token)
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/gravacao',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

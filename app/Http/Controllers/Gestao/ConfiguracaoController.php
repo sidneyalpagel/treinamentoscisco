@@ -21,6 +21,7 @@ class ConfiguracaoController extends Controller
             'configurado' => SmtpRuntime::configurado(),
             'jitsi' => Configuracao::mapa(JitsiToken::CHAVES),
             'jitsiConfigurado' => JitsiToken::configurado(),
+            'gravacao' => Configuracao::mapa(['jibri_base_url', 'gravacao_secret']),
         ]);
     }
 
@@ -64,18 +65,26 @@ class ConfiguracaoController extends Controller
             'jitsi_domain' => ['nullable', 'string', 'max:255'],
             'jitsi_app_id' => ['nullable', 'string', 'max:255'],
             'jitsi_app_secret' => ['nullable', 'string', 'max:255'],
+            'jibri_base_url' => ['nullable', 'url', 'max:255'],
+            'gravacao_secret' => ['nullable', 'string', 'max:255'],
         ], [], [
             'jitsi_domain' => 'domínio',
             'jitsi_app_id' => 'app id',
             'jitsi_app_secret' => 'segredo',
+            'jibri_base_url' => 'URL do Jibri',
+            'gravacao_secret' => 'segredo de gravação',
         ]);
 
         Configuracao::definir('jitsi_domain', $dados['jitsi_domain'] ?? null);
         Configuracao::definir('jitsi_app_id', $dados['jitsi_app_id'] ?? null);
+        Configuracao::definir('jibri_base_url', $dados['jibri_base_url'] ?? null);
 
-        // Segredo só é alterado quando um novo valor é digitado.
+        // Segredos só são alterados quando um novo valor é digitado.
         if (filled($dados['jitsi_app_secret'] ?? null)) {
             Configuracao::definir('jitsi_app_secret', $dados['jitsi_app_secret']);
+        }
+        if (filled($dados['gravacao_secret'] ?? null)) {
+            Configuracao::definir('gravacao_secret', $dados['gravacao_secret']);
         }
 
         return back()->with('sucesso', 'Configurações de videoconferência salvas.');

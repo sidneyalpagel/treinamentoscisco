@@ -134,6 +134,25 @@
                 @error('jitsi_app_secret') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 <p class="mt-1 text-xs text-slate-500">É o <code>JWT_APP_SECRET</code> do servidor Jitsi. Armazenado cifrado. Deixe em branco para não alterar.</p>
             </div>
+
+            <div class="pt-4 border-t border-slate-100">
+                <h3 class="text-sm font-semibold text-slate-700 mb-3">Gravação (servidor Jibri)</h3>
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="jibri_base_url" class="block text-sm font-medium text-slate-700 mb-1.5">URL do serviço de arquivos</label>
+                        <input id="jibri_base_url" name="jibri_base_url" value="{{ old('jibri_base_url', $gravacao['jibri_base_url']) }}" class="{{ $campo }} @error('jibri_base_url') border-red-400 @enderror" placeholder="http://172.18.100.101:8090/rec">
+                        @error('jibri_base_url') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        <p class="mt-1 text-xs text-slate-500">Endereço interno do Jibri de onde o portal busca as gravações.</p>
+                    </div>
+                    <div>
+                        <label for="gravacao_secret" class="block text-sm font-medium text-slate-700 mb-1.5">Segredo de gravação</label>
+                        <input id="gravacao_secret" name="gravacao_secret" type="password" value="" autocomplete="new-password" class="{{ $campo }} @error('gravacao_secret') border-red-400 @enderror" placeholder="{{ $gravacao['gravacao_secret'] ? '•••••••• (deixe em branco para manter)' : 'Token compartilhado com o Jibri' }}">
+                        @error('gravacao_secret') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        <p class="mt-1 text-xs text-slate-500">Autentica o webhook do Jibri e o download. Cifrado.</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex gap-2 pt-2">
                 <button type="submit" class="rounded-lg bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 transition-colors">Salvar videoconferência</button>
             </div>

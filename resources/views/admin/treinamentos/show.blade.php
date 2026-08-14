@@ -137,6 +137,28 @@
                             <button type="button" onclick="copiarLinkSala(this)" class="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Copiar</button>
                         </div>
                         <p class="mt-1.5 text-xs text-slate-500">Compartilhe este link único com os participantes.</p>
+
+                        @if ($treinamento->gravacoes->isNotEmpty())
+                            <div class="mt-5 pt-4 border-t border-slate-100">
+                                <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Gravações</div>
+                                <ul class="space-y-2">
+                                    @foreach ($treinamento->gravacoes as $g)
+                                        <li class="flex items-center justify-between gap-2 text-sm">
+                                            <span class="text-slate-600">
+                                                {{ optional($g->gravado_em)->translatedFormat('d/m/Y H:i') ?? 'Gravação' }}
+                                                @if ($g->tamanho_legivel)<span class="text-slate-400"> · {{ $g->tamanho_legivel }}</span>@endif
+                                            </span>
+                                            <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('gravacoes.download', now()->addDays(7), ['gravacao' => $g->id]) }}"
+                                               class="shrink-0 inline-flex items-center gap-1 text-brand-700 hover:text-brand-800 font-medium">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                                                Baixar
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <form method="POST" action="{{ route('admin.sala.remover', $treinamento) }}" onsubmit="return confirm('Remover a sala? Os links deixarão de funcionar.');" class="mt-4">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-xs text-slate-400 hover:text-red-600">Remover sala</button>

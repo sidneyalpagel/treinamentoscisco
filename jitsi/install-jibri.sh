@@ -23,6 +23,10 @@ JIBRI_CONTROL_PASS="${JIBRI_CONTROL_PASS:-}"
 JIBRI_RECORDER_PASS="${JIBRI_RECORDER_PASS:-}"
 RECORDINGS_DIR="${RECORDINGS_DIR:-/srv/recordings}"
 FINALIZE_SRC="${FINALIZE_SRC:-$SCRIPT_DIR/finalize.sh}"
+# Integração com o portal (gravação → e-mail). Opcionais:
+GRAVACAO_SECRET="${GRAVACAO_SECRET:-}"   # = gravacao_secret cadastrado no portal
+PORTAL_WEBHOOK="${PORTAL_WEBHOOK:-}"     # ex.: https://treinamentos.ciscopar.com.br/webhooks/gravacao
+REC_PORT="${REC_PORT:-8090}"             # porta do serviço de arquivos (rede interna)
 
 c() { printf '\033[%sm' "$1"; }
 log()  { printf '%s➜ %s%s\n' "$(c '1;34')" "$*" "$(c 0)"; }
@@ -117,6 +121,42 @@ else
     : > /etc/jitsi/jibri/finalize.sh; chmod +x /etc/jitsi/jibri/finalize.sh
 fi
 ok "Gravações em ${RECORDINGS_DIR}."
+
+# ---------------------------------------------------------------------------
+# 5b. Servidor de arquivos (nginx) + finalize.env — integração com o portal
+#     O portal busca as gravações aqui (rede interna) e as serve por streaming.
+# ---------------------------------------------------------------------------
+if [ -n "$GRAVACAO_SECRET" ] && [ -n "$PORTAL_WEBHOOK" ]; then
+    log "Configurando o serviço de arquivos (nginx) na porta ${REC_PORT}..."
+    apt-get install -y nginx-light >/dev/null 2>&1 || apt-get install -y nginx
+    cat > /etc/nginx/sites-available/jibri-rec <<EOF
+server {
+    listen ${REC_PORT};
+    server_name _;
+    location /rec/ {
+        if (\$arg_k != "${GRAVACAO_SECRET}") { return 403; }
+        alias ${RECORDINGS_DIR}/;
+        autoindex off;
+        add_header Content-Disposition "attachment";
+    }
+    location / { return 404; }
+}
+EOF
+    ln -sf /etc/nginx/sites-available/jibri-rec /etc/nginx/sites-enabled/jibri-rec
+    nginx -t && systemctl reload nginx || systemctl restart nginx
+    ok "Serviço de arquivos em http://<IP-do-jibri>:${REC_PORT}/rec/ (protegido por token)."
+
+    # finalize.env lido pelo finalize.sh
+    cat > /etc/jitsi/jibri/finalize.env <<EOF
+PORTAL_WEBHOOK="${PORTAL_WEBHOOK}"
+PORTAL_TOKEN="${GRAVACAO_SECRET}"
+EOF
+    chmod 600 /etc/jitsi/jibri/finalize.env
+    ok "finalize.env configurado (webhook do portal)."
+    warn "No portal (Configurações → Gravação): jibri_base_url = http://<IP-do-jibri>:${REC_PORT}/rec ; gravacao_secret = (o mesmo GRAVACAO_SECRET)."
+else
+    warn "GRAVACAO_SECRET/PORTAL_WEBHOOK não definidos — pulo o serviço de arquivos e o webhook (grava só localmente)."
+fi
 
 # ---------------------------------------------------------------------------
 # 6. jibri.conf (aponta para o Core)

@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\TreinamentoController;
 use App\Http\Controllers\Auth\AtivacaoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CertificadoPublicoController;
+use App\Http\Controllers\GravacaoDownloadController;
+use App\Http\Controllers\GravacaoWebhookController;
 use App\Http\Controllers\Gestao\AreaController;
 use App\Http\Controllers\Gestao\ConfiguracaoController;
 use App\Http\Controllers\Gestao\DashboardController as GestaoDashboardController;
@@ -37,6 +39,10 @@ Route::get('/certificado/{certificado:codigo}', [CertificadoPublicoController::c
 
 // Sala de videoconferência (link único do participante)
 Route::get('/sala/{codigo}', [PublicController::class, 'entrarSala'])->name('sala.publica');
+
+// Gravações
+Route::post('/webhooks/gravacao', [GravacaoWebhookController::class, 'store'])->name('webhooks.gravacao'); // Jibri → portal (bearer)
+Route::get('/gravacoes/{gravacao}/download', GravacaoDownloadController::class)->middleware('signed')->name('gravacoes.download');
 
 /*
 |--------------------------------------------------------------------------
