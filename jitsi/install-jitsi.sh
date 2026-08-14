@@ -161,6 +161,22 @@ jitsi-meet-tokens jitsi-meet-tokens/appid string ${JWT_APP_ID}
 jitsi-meet-tokens jitsi-meet-tokens/appsecret password ${JWT_APP_SECRET}
 EOF
 apt-get install -y jitsi-meet-tokens
+
+# O token auth do Prosody depende do módulo Lua 'inspect'. O pacote lua-inspect do
+# apt não cobre o Lua 5.4 do Prosody (só 5.1–5.3); inspect.lua é Lua puro, então
+# garantimos uma cópia no caminho da versão de Lua usada pelo Prosody.
+apt-get install -y lua-inspect || true
+PLUA="$(prosodyctl about 2>/dev/null | grep -oiE 'Lua 5\.[0-9]' | grep -oE '5\.[0-9]' | head -1)"
+PLUA="${PLUA:-5.4}"
+if [ ! -f "/usr/share/lua/${PLUA}/inspect.lua" ]; then
+    SRC_INSPECT="$(ls /usr/share/lua/*/inspect.lua 2>/dev/null | head -1)"
+    if [ -n "$SRC_INSPECT" ]; then
+        install -D -m 0644 "$SRC_INSPECT" "/usr/share/lua/${PLUA}/inspect.lua"
+        ok "Módulo Lua 'inspect' disponibilizado para o Prosody (Lua ${PLUA})."
+    else
+        warn "lua-inspect não encontrado — o token auth pode falhar. Instale 'inspect.lua' manualmente."
+    fi
+fi
 ok "JWT habilitado (só entra quem tiver token assinado pelo portal)."
 
 # ---------------------------------------------------------------------------
