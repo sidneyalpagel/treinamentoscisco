@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Str;
 
 class Gravacao extends Model
 {
     protected $table = 'gravacoes';
 
-    protected $fillable = ['treinamento_id', 'arquivo', 'tamanho', 'duracao_seg', 'gravado_em'];
+    protected $fillable = ['arquivo', 'tamanho', 'duracao_seg', 'gravado_em'];
 
     protected function casts(): array
     {
@@ -20,9 +21,22 @@ class Gravacao extends Model
         ];
     }
 
-    public function treinamento(): BelongsTo
+    /** Treinamento ou Reuniao à qual a gravação pertence. */
+    public function gravavel(): MorphTo
     {
-        return $this->belongsTo(Treinamento::class);
+        return $this->morphTo();
+    }
+
+    /** Título da origem (treinamento/reunião), para nome de arquivo etc. */
+    public function tituloOrigem(): string
+    {
+        return $this->gravavel?->titulo ?? 'gravacao';
+    }
+
+    /** Nome sugerido para o download. */
+    public function nomeDownload(): string
+    {
+        return 'gravacao-'.(Str::slug($this->tituloOrigem()) ?: 'reuniao').'.mp4';
     }
 
     /** Tamanho legível (ex.: "42,3 MB"). */

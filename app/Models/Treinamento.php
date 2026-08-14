@@ -115,9 +115,9 @@ class Treinamento extends Model
         return $this->hasMany(Sessao::class)->orderBy('data')->orderBy('hora_inicio');
     }
 
-    public function gravacoes(): HasMany
+    public function gravacoes(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
-        return $this->hasMany(Gravacao::class)->latest('gravado_em');
+        return $this->morphMany(Gravacao::class, 'gravavel')->latest('gravado_em');
     }
 
     public function certificados(): HasManyThrough

@@ -2,6 +2,7 @@
     $itensMobile = [
         ['rota' => 'admin.dashboard', 'ativo' => 'admin.dashboard', 'rotulo' => 'Painel'],
         ['rota' => 'admin.treinamentos.index', 'ativo' => 'admin.treinamentos.*', 'rotulo' => 'Treinamentos'],
+        ['rota' => 'admin.reunioes.index', 'ativo' => 'admin.reunioes.*', 'rotulo' => 'Reuniões'],
         ['rota' => 'admin.inscricoes.index', 'ativo' => 'admin.inscricoes.*', 'rotulo' => 'Inscrições'],
         ['rota' => 'admin.presenca.painel', 'ativo' => ['admin.presenca.*', 'admin.sessoes.*'], 'rotulo' => 'Presença'],
         ['rota' => 'admin.certificados.painel', 'ativo' => 'admin.certificados.*', 'rotulo' => 'Certificados'],

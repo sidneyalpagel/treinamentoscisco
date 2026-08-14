@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\GravacaoDisponivel;
 use App\Models\Configuracao;
+use App\Models\Reuniao;
 use App\Models\Treinamento;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,21 +33,22 @@ class GravacaoWebhookController extends Controller
             'duracao' => ['nullable', 'integer', 'min:0'],
         ]);
 
-        $treinamento = Treinamento::where('sala_codigo', $dados['sala'])->first();
+        // A sala pode pertencer a um treinamento online ou a uma reunião avulsa.
+        $origem = Treinamento::where('sala_codigo', $dados['sala'])->first()
+            ?? Reuniao::where('sala_codigo', $dados['sala'])->first();
 
-        if (! $treinamento) {
-            // Sala sem treinamento correspondente — aceita mas não registra.
+        if (! $origem) {
             return response()->json(['ok' => false, 'motivo' => 'sala não encontrada'], 202);
         }
 
-        $gravacao = $treinamento->gravacoes()->create([
+        $gravacao = $origem->gravacoes()->create([
             'arquivo' => $dados['arquivo'],
             'tamanho' => $dados['tamanho'] ?? null,
             'duracao_seg' => $dados['duracao'] ?? null,
             'gravado_em' => now(),
         ]);
 
-        $gestor = $treinamento->user;
+        $gestor = $origem->user;
         if ($gestor && filled($gestor->email)) {
             $url = URL::temporarySignedRoute('gravacoes.download', now()->addDays(7), ['gravacao' => $gravacao->id]);
 

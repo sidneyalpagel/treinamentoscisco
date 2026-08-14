@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\InscricaoRequest;
 use App\Models\Inscricao;
+use App\Models\Reuniao;
 use App\Models\Treinamento;
 use App\Support\JitsiToken;
 use Illuminate\Http\RedirectResponse;
@@ -80,6 +81,21 @@ class PublicController extends Controller
         abort_unless(JitsiToken::configurado(), 503);
 
         $url = JitsiToken::url($treinamento->sala_codigo, [], moderador: false);
+
+        return redirect()->away($url);
+    }
+
+    /**
+     * Entrada pública na sala de uma reunião avulsa (link único do participante).
+     */
+    public function entrarReuniao(string $codigo): RedirectResponse
+    {
+        $reuniao = Reuniao::where('sala_codigo', $codigo)->first();
+
+        abort_unless($reuniao, 404);
+        abort_unless(JitsiToken::configurado(), 503);
+
+        $url = JitsiToken::url($reuniao->sala_codigo, [], moderador: false);
 
         return redirect()->away($url);
     }

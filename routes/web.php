@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CertificadoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InscricaoController;
+use App\Http\Controllers\Admin\ReuniaoController;
 use App\Http\Controllers\Admin\SalaController;
 use App\Http\Controllers\Admin\SessaoController;
 use App\Http\Controllers\Admin\TreinamentoController;
@@ -40,6 +41,9 @@ Route::get('/certificado/{certificado:codigo}', [CertificadoPublicoController::c
 // Sala de videoconferência (link único do participante)
 Route::get('/sala/{codigo}', [PublicController::class, 'entrarSala'])->name('sala.publica');
 
+// Sala de reunião avulsa (link único do participante)
+Route::get('/reuniao/{codigo}', [PublicController::class, 'entrarReuniao'])->name('reuniao.publica');
+
 // Gravações
 Route::post('/webhooks/gravacao', [GravacaoWebhookController::class, 'store'])->name('webhooks.gravacao'); // Jibri → portal (bearer)
 Route::get('/gravacoes/{gravacao}/download', GravacaoDownloadController::class)->middleware('signed')->name('gravacoes.download');
@@ -70,6 +74,10 @@ Route::middleware(['auth', 'role:gestor'])
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('treinamentos', TreinamentoController::class);
+
+        // Reuniões avulsas
+        Route::get('reunioes/{reuniao}/entrar', [ReuniaoController::class, 'entrar'])->name('reunioes.entrar');
+        Route::resource('reunioes', ReuniaoController::class)->parameters(['reunioes' => 'reuniao']);
 
         // Sala de videoconferência do treinamento
         Route::post('treinamentos/{treinamento}/sala', [SalaController::class, 'criar'])->name('sala.criar');

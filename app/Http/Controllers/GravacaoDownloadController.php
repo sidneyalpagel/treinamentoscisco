@@ -27,7 +27,7 @@ class GravacaoDownloadController extends Controller
         $stream = @fopen($origem, 'rb', false, $ctx);
         abort_if($stream === false, 502, 'Não foi possível obter a gravação do servidor.');
 
-        $nome = 'gravacao-'.$gravacao->treinamento->slug.'.mp4';
+        $nome = $gravacao->nomeDownload();
 
         return response()->streamDownload(function () use ($stream) {
             while (! feof($stream)) {

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('gravacoes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('treinamento_id')->constrained('treinamentos')->cascadeOnDelete();
+            $table->morphs('gravavel'); // pertence a um Treinamento ou a uma Reuniao
             $table->string('arquivo'); // caminho relativo no servidor Jibri (ex.: <sessao>/<arquivo>.mp4)
             $table->unsignedBigInteger('tamanho')->nullable();
             $table->unsignedInteger('duracao_seg')->nullable();
