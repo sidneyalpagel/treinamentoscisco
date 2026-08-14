@@ -21,7 +21,7 @@ class GravacaoDisponivel extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Gravação disponível · '.$this->gravacao->treinamento->titulo,
+            subject: 'Gravação disponível · '.$this->gravacao->tituloOrigem(),
         );
     }
 

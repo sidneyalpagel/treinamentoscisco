@@ -30,6 +30,9 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => User::ROLE_GESTOR,
+            'ativo' => true,
+            'convite_token' => null,
         ];
     }
 
@@ -40,6 +43,20 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn () => ['role' => User::ROLE_ADMIN]);
+    }
+
+    /** Convite pendente (ainda não ativou). */
+    public function pendente(): static
+    {
+        return $this->state(fn () => [
+            'convite_token' => Str::random(64),
+            'convite_enviado_em' => now(),
         ]);
     }
 }

@@ -19,7 +19,7 @@
                         <td style="padding:32px;">
                             <p style="margin:0 0 16px; font-size:16px;">A gravação do seu treinamento está pronta.</p>
                             <p style="margin:0 0 16px; font-size:14px; line-height:1.6;">
-                                Treinamento: <strong>{{ $gravacao->treinamento->titulo }}</strong><br>
+                                {{ $gravacao->tituloOrigem() }}<br>
                                 @if ($gravacao->gravado_em)
                                     Gravado em: {{ $gravacao->gravado_em->translatedFormat('d/m/Y H:i') }}<br>
                                 @endif
