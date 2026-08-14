@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 
 class Treinamento extends Model
@@ -91,6 +92,11 @@ class Treinamento extends Model
     public function sessoes(): HasMany
     {
         return $this->hasMany(Sessao::class)->orderBy('data')->orderBy('hora_inicio');
+    }
+
+    public function certificados(): HasManyThrough
+    {
+        return $this->hasManyThrough(Certificado::class, Inscricao::class);
     }
 
     /* --------------------------------------------------------------------- */

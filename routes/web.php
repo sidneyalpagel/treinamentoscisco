@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\CertificadoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InscricaoController;
 use App\Http\Controllers\Admin\SessaoController;
 use App\Http\Controllers\Admin\TreinamentoController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CertificadoPublicoController;
 use App\Http\Controllers\PresencaController;
 use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +24,10 @@ Route::post('/treinamentos/{treinamento:slug}/inscricao', [PublicController::cla
 // Check-in público de presença (link por sessão)
 Route::get('/presenca/{sessao:codigo}', [PresencaController::class, 'form'])->name('presenca.form');
 Route::post('/presenca/{sessao:codigo}', [PresencaController::class, 'registrar'])->name('presenca.registrar');
+
+// Certificados (público)
+Route::get('/validar', [CertificadoPublicoController::class, 'validar'])->name('certificados.validar');
+Route::get('/certificado/{certificado:codigo}', [CertificadoPublicoController::class, 'mostrar'])->name('certificados.mostrar');
 
 /*
 |--------------------------------------------------------------------------
@@ -61,4 +67,11 @@ Route::middleware('auth')
         Route::get('sessoes/{sessao}/presenca/exportar', [SessaoController::class, 'exportarPresenca'])->name('sessoes.presenca.exportar');
         Route::get('sessoes/{sessao}/presenca', [SessaoController::class, 'presenca'])->name('sessoes.presenca');
         Route::post('sessoes/{sessao}/presenca/{inscricao}', [SessaoController::class, 'togglePresenca'])->name('sessoes.presenca.toggle');
+
+        // Certificados
+        Route::get('certificados', [CertificadoController::class, 'painel'])->name('certificados.painel');
+        Route::get('treinamentos/{treinamento}/certificados', [CertificadoController::class, 'index'])->name('certificados.index');
+        Route::post('treinamentos/{treinamento}/certificados/emitir', [CertificadoController::class, 'emitirTodos'])->name('certificados.emitir-todos');
+        Route::post('inscricoes/{inscricao}/certificado', [CertificadoController::class, 'emitir'])->name('certificados.emitir');
+        Route::delete('certificados/{certificado}', [CertificadoController::class, 'destroy'])->name('certificados.destroy');
     });

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Inscricao extends Model
 {
@@ -31,6 +32,11 @@ class Inscricao extends Model
     public function treinamento(): BelongsTo
     {
         return $this->belongsTo(Treinamento::class);
+    }
+
+    public function certificado(): HasOne
+    {
+        return $this->hasOne(Certificado::class);
     }
 
     /* Escopos */

@@ -24,6 +24,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <a href="{{ route('agenda') }}" class="hover:text-white transition-colors">Agenda</a>
+                <a href="{{ route('certificados.validar') }}" class="hidden sm:inline hover:text-white transition-colors">Validar certificado</a>
                 <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 hover:text-white transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
                     Área do Administrador
@@ -86,6 +87,7 @@
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Início</a></li>
                     <li><a href="{{ route('agenda') }}" class="hover:text-white transition-colors">Agenda de treinamentos</a></li>
+                    <li><a href="{{ route('certificados.validar') }}" class="hover:text-white transition-colors">Validar certificado</a></li>
                     <li><a href="{{ route('login') }}" class="hover:text-white transition-colors">Área do administrador</a></li>
                 </ul>
             </div>
