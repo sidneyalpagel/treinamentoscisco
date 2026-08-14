@@ -65,7 +65,7 @@ npm run dev                    # assets em modo desenvolvimento (hot reload)
 - [x] Cadastro e gestão de **Treinamentos** (CRUD)
 - [x] **Agenda** pública de treinamentos
 - [x] **Inscrições** (formulário público + gestão das listas + exportação CSV)
-- [ ] **Lista de presença** por sessão/horário
+- [x] **Lista de presença** por sessão (auto check-in público + gestão + CSV)
 - [ ] **Certificados** por participante (com validação)
 
 ## Observações de ambiente

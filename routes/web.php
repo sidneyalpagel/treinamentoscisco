@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InscricaoController;
+use App\Http\Controllers\Admin\SessaoController;
 use App\Http\Controllers\Admin\TreinamentoController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\PresencaController;
 use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +18,10 @@ Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::get('/agenda', [PublicController::class, 'agenda'])->name('agenda');
 Route::get('/treinamentos/{treinamento:slug}', [PublicController::class, 'treinamento'])->name('treinamentos.show');
 Route::post('/treinamentos/{treinamento:slug}/inscricao', [PublicController::class, 'inscrever'])->name('treinamentos.inscrever');
+
+// Check-in público de presença (link por sessão)
+Route::get('/presenca/{sessao:codigo}', [PresencaController::class, 'form'])->name('presenca.form');
+Route::post('/presenca/{sessao:codigo}', [PresencaController::class, 'registrar'])->name('presenca.registrar');
 
 /*
 |--------------------------------------------------------------------------
@@ -45,4 +51,14 @@ Route::middleware('auth')
         Route::get('inscricoes/exportar', [InscricaoController::class, 'exportar'])->name('inscricoes.exportar');
         Route::patch('inscricoes/{inscricao}', [InscricaoController::class, 'update'])->name('inscricoes.update');
         Route::delete('inscricoes/{inscricao}', [InscricaoController::class, 'destroy'])->name('inscricoes.destroy');
+
+        // Sessões e presença
+        Route::get('presenca', [SessaoController::class, 'painel'])->name('presenca.painel');
+        Route::get('treinamentos/{treinamento}/sessoes', [SessaoController::class, 'index'])->name('sessoes.index');
+        Route::post('treinamentos/{treinamento}/sessoes', [SessaoController::class, 'store'])->name('sessoes.store');
+        Route::delete('sessoes/{sessao}', [SessaoController::class, 'destroy'])->name('sessoes.destroy');
+        Route::patch('sessoes/{sessao}/chamada', [SessaoController::class, 'toggleChamada'])->name('sessoes.chamada');
+        Route::get('sessoes/{sessao}/presenca/exportar', [SessaoController::class, 'exportarPresenca'])->name('sessoes.presenca.exportar');
+        Route::get('sessoes/{sessao}/presenca', [SessaoController::class, 'presenca'])->name('sessoes.presenca');
+        Route::post('sessoes/{sessao}/presenca/{inscricao}', [SessaoController::class, 'togglePresenca'])->name('sessoes.presenca.toggle');
     });

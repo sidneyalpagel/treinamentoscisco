@@ -88,6 +88,11 @@ class Treinamento extends Model
         return $this->hasMany(Inscricao::class);
     }
 
+    public function sessoes(): HasMany
+    {
+        return $this->hasMany(Sessao::class)->orderBy('data')->orderBy('hora_inicio');
+    }
+
     /* --------------------------------------------------------------------- */
     /* Escopos                                                               */
     /* --------------------------------------------------------------------- */

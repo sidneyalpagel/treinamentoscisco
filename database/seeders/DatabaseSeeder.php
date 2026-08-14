@@ -132,6 +132,16 @@ class DatabaseSeeder extends Seeder
                     $pessoa
                 );
             }
+
+            // Uma sessão de exemplo por treinamento (apenas se ainda não houver)
+            if ($treinamento->sessoes()->count() === 0) {
+                $treinamento->sessoes()->create([
+                    'titulo' => 'Encontro único',
+                    'data' => $treinamento->data_inicio->toDateString(),
+                    'hora_inicio' => $treinamento->data_inicio->format('H:i'),
+                    'hora_fim' => $treinamento->data_fim?->format('H:i'),
+                ]);
+            }
         }
     }
 }
