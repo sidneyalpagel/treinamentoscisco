@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InscricaoController;
 use App\Http\Controllers\Admin\SessaoController;
 use App\Http\Controllers\Admin\TreinamentoController;
+use App\Http\Controllers\Auth\AtivacaoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CertificadoPublicoController;
 use App\Http\Controllers\Gestao\AreaController;
@@ -43,6 +44,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])->name('login.store');
 });
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
+
+// Ativação de cadastro por convite (público)
+Route::get('/ativar/{token}', [AtivacaoController::class, 'form'])->name('ativar.form');
+Route::post('/ativar/{token}', [AtivacaoController::class, 'store'])->name('ativar.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +99,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::resource('usuarios', UsuarioController::class)->except(['show']);
         Route::patch('usuarios/{usuario}/senha', [UsuarioController::class, 'redefinirSenha'])->name('usuarios.senha');
         Route::patch('usuarios/{usuario}/status', [UsuarioController::class, 'alternarStatus'])->name('usuarios.status');
+        Route::patch('usuarios/{usuario}/convite', [UsuarioController::class, 'reenviarConvite'])->name('usuarios.convite');
 
         // Configurações da plataforma (SMTP)
         Route::get('configuracoes', [ConfiguracaoController::class, 'edit'])->name('configuracoes.edit');

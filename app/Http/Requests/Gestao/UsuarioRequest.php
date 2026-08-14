@@ -28,7 +28,6 @@ class UsuarioRequest extends FormRequest
     public function rules(): array
     {
         $usuarioId = $this->route('usuario')?->id;
-        $criando = is_null($usuarioId);
 
         return [
             'name' => ['required', 'string', 'max:255'],
@@ -40,7 +39,6 @@ class UsuarioRequest extends FormRequest
                 'exists:areas,id',
             ],
             'ativo' => ['boolean'],
-            'password' => [$criando ? 'required' : 'nullable', 'string', 'min:8', 'confirmed'],
         ];
     }
 

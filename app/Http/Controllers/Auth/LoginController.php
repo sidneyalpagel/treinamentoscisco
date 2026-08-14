@@ -40,6 +40,14 @@ class LoginController extends Controller
             ]);
         }
 
+        // Bloqueia acesso de quem ainda não confirmou o cadastro (convite pendente)
+        if (Auth::user()->pendenteAtivacao()) {
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email' => 'Seu cadastro ainda não foi confirmado. Verifique o e-mail de convite para definir sua senha.',
+            ]);
+        }
+
         // Bloqueia acesso de usuários desativados
         if (! Auth::user()->ativo) {
             Auth::logout();

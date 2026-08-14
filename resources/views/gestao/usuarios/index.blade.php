@@ -64,13 +64,33 @@
                             <td class="px-5 py-3.5 text-slate-600">{{ optional($u->area)->nome ?? '—' }}</td>
                             <td class="px-5 py-3.5 text-slate-600">{{ $u->treinamentos_count }}</td>
                             <td class="px-5 py-3.5">
-                                <x-status-badge :status="$u->ativo ? 'publicado' : 'encerrado'" :label="$u->ativo ? 'Ativo' : 'Inativo'" />
+                                @if ($u->pendenteAtivacao())
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Pendente
+                                    </span>
+                                @elseif ($u->ativo)
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ativo
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/20">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inativo
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-5 py-3.5">
                                 <div class="flex items-center justify-end gap-1">
                                     <a href="{{ route('gestao.usuarios.edit', $u) }}" title="Editar" class="grid place-items-center w-8 h-8 rounded-md text-slate-500 hover:bg-brand-50 hover:text-brand-700">
                                         <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
                                     </a>
+                                    @if ($u->pendenteAtivacao())
+                                        <form method="POST" action="{{ route('gestao.usuarios.convite', $u) }}">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" title="Reenviar convite" class="grid place-items-center w-8 h-8 rounded-md text-slate-500 hover:bg-brand-50 hover:text-brand-700">
+                                                <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>
+                                            </button>
+                                        </form>
+                                    @endif
                                     @if ($u->id !== auth()->id())
                                         <form method="POST" action="{{ route('gestao.usuarios.status', $u) }}">
                                             @csrf @method('PATCH')

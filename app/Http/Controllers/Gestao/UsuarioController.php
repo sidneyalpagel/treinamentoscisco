@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Gestao;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestao\UsuarioRequest;
+use App\Mail\ConviteGestor;
 use App\Models\Area;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class UsuarioController extends Controller
@@ -45,11 +48,59 @@ class UsuarioController extends Controller
 
     public function store(UsuarioRequest $request): RedirectResponse
     {
-        $dados = $request->safe()->only(['name', 'email', 'role', 'area_id', 'ativo', 'password']);
+        $usuario = new User($request->safe()->only(['name', 'email', 'role', 'area_id', 'ativo']));
+        // Senha temporária inutilizável — o próprio usuário define a dele na ativação.
+        $usuario->password = Str::random(40);
+        $usuario->save();
 
-        User::create($dados);
+        $enviado = $this->enviarConvite($usuario);
 
-        return redirect()->route('gestao.usuarios.index')->with('sucesso', 'Usuário cadastrado com sucesso.');
+        return redirect()->route('gestao.usuarios.index')->with(
+            $enviado ? 'sucesso' : 'erro',
+            $enviado
+                ? "Usuário cadastrado. Convite enviado para {$usuario->email}."
+                : "Usuário cadastrado, mas o e-mail de convite falhou. Confira o SMTP em Configurações e use \"Reenviar convite\"."
+        );
+    }
+
+    /**
+     * Reenvia o convite de ativação (gera um novo link).
+     */
+    public function reenviarConvite(User $usuario): RedirectResponse
+    {
+        if (! $usuario->pendenteAtivacao()) {
+            return back()->with('erro', 'Este usuário já confirmou o cadastro.');
+        }
+
+        $enviado = $this->enviarConvite($usuario);
+
+        return back()->with(
+            $enviado ? 'sucesso' : 'erro',
+            $enviado
+                ? "Convite reenviado para {$usuario->email}."
+                : 'Falha ao enviar o convite. Confira o SMTP em Configurações.'
+        );
+    }
+
+    /**
+     * Gera o token, persiste e dispara o e-mail de convite. Retorna se enviou.
+     */
+    private function enviarConvite(User $usuario): bool
+    {
+        $token = $usuario->gerarConvite();
+        $usuario->save();
+
+        try {
+            Mail::to($usuario->email)->send(
+                new ConviteGestor($usuario, route('ativar.form', $token))
+            );
+
+            return true;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
     }
 
     public function edit(User $usuario): View
