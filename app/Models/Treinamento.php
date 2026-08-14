@@ -39,6 +39,8 @@ class Treinamento extends Model
         'status',
         'permite_inscricao',
         'gera_certificado',
+        'sala_codigo',
+        'sala_criada_em',
     ];
 
     protected function casts(): array
@@ -47,11 +49,24 @@ class Treinamento extends Model
             'data_inicio' => 'datetime',
             'data_fim' => 'datetime',
             'inscricoes_ate' => 'date',
+            'sala_criada_em' => 'datetime',
             'permite_inscricao' => 'boolean',
             'gera_certificado' => 'boolean',
             'carga_horaria' => 'integer',
             'vagas' => 'integer',
         ];
+    }
+
+    /** Modalidade permite videoconferência (online ou híbrido). */
+    public function modalidadeOnline(): bool
+    {
+        return in_array($this->modalidade, [self::MODALIDADE_ONLINE, self::MODALIDADE_HIBRIDO], true);
+    }
+
+    /** Já existe uma sala de videoconferência criada. */
+    public function temSala(): bool
+    {
+        return ! blank($this->sala_codigo);
     }
 
     /**

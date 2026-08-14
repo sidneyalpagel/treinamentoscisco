@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InscricaoRequest;
 use App\Models\Inscricao;
 use App\Models\Treinamento;
+use App\Support\JitsiToken;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -65,5 +66,21 @@ class PublicController extends Controller
         return redirect()
             ->route('treinamentos.show', $treinamento)
             ->with('inscricao_sucesso', $inscricao->id);
+    }
+
+    /**
+     * Entrada pública na sala (link único do participante).
+     * Gera um token de participante na hora e redireciona ao Jitsi.
+     */
+    public function entrarSala(string $codigo): RedirectResponse
+    {
+        $treinamento = Treinamento::publicados()->where('sala_codigo', $codigo)->first();
+
+        abort_unless($treinamento, 404);
+        abort_unless(JitsiToken::configurado(), 503);
+
+        $url = JitsiToken::url($treinamento->sala_codigo, [], moderador: false);
+
+        return redirect()->away($url);
     }
 }

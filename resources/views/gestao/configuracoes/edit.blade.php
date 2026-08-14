@@ -96,4 +96,47 @@
             </div>
         </div>
     </form>
+
+    {{-- Videoconferência (Jitsi) --}}
+    <div class="mt-10 mb-6 flex items-start justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-bold text-slate-800">Videoconferência (Jitsi)</h2>
+            <p class="text-sm text-slate-500">Usada para as salas de treinamentos online. Os dados devem casar com o servidor Jitsi.</p>
+        </div>
+        @if ($jitsiConfigurado)
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Configurado
+            </span>
+        @else
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Não configurado
+            </span>
+        @endif
+    </div>
+
+    <form method="POST" action="{{ route('gestao.configuracoes.jitsi') }}">
+        @csrf @method('PUT')
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5 max-w-2xl">
+            <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                    <label for="jitsi_domain" class="block text-sm font-medium text-slate-700 mb-1.5">Domínio <span class="text-red-500">*</span></label>
+                    <input id="jitsi_domain" name="jitsi_domain" value="{{ old('jitsi_domain', $jitsi['jitsi_domain']) }}" class="{{ $campo }} @error('jitsi_domain') border-red-400 @enderror" placeholder="meet.ciscopar.com.br">
+                    @error('jitsi_domain') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="jitsi_app_id" class="block text-sm font-medium text-slate-700 mb-1.5">App ID</label>
+                    <input id="jitsi_app_id" name="jitsi_app_id" value="{{ old('jitsi_app_id', $jitsi['jitsi_app_id']) }}" class="{{ $campo }}" placeholder="ciscopar">
+                </div>
+            </div>
+            <div>
+                <label for="jitsi_app_secret" class="block text-sm font-medium text-slate-700 mb-1.5">Segredo (App Secret)</label>
+                <input id="jitsi_app_secret" name="jitsi_app_secret" type="password" value="" autocomplete="new-password" class="{{ $campo }} @error('jitsi_app_secret') border-red-400 @enderror" placeholder="{{ $jitsi['jitsi_app_secret'] ? '•••••••• (deixe em branco para manter)' : 'JWT_APP_SECRET do jitsi.conf' }}">
+                @error('jitsi_app_secret') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                <p class="mt-1 text-xs text-slate-500">É o <code>JWT_APP_SECRET</code> do servidor Jitsi. Armazenado cifrado. Deixe em branco para não alterar.</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button type="submit" class="rounded-lg bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 transition-colors">Salvar videoconferência</button>
+            </div>
+        </div>
+    </form>
 @endsection

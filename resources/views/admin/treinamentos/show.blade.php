@@ -111,6 +111,49 @@
                 </a>
             </div>
 
+            @if ($treinamento->modalidadeOnline())
+                <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 class="font-semibold text-slate-800 mb-1">Videoconferência</h2>
+                    @if (! $treinamento->temSala())
+                        <p class="text-sm text-slate-500 mb-4">Crie a sala online para gerar os links de acesso.</p>
+                        <form method="POST" action="{{ route('admin.sala.criar', $treinamento) }}">
+                            @csrf
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-700 px-3.5 py-2 text-sm font-semibold text-white hover:bg-brand-800 transition-colors">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+                                Criar sala
+                            </button>
+                        </form>
+                    @else
+                        <p class="text-sm text-slate-500 mb-4">Você entra como <strong>moderador</strong> — grava e controla a reunião.</p>
+                        <a href="{{ route('admin.sala.entrar', $treinamento) }}" target="_blank"
+                           class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-700 px-3.5 py-2 text-sm font-semibold text-white hover:bg-brand-800 transition-colors mb-4">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+                            Entrar na sala
+                        </a>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Link dos participantes</label>
+                        <div class="flex gap-2">
+                            <input id="link-sala" type="text" readonly value="{{ route('sala.publica', $treinamento->sala_codigo) }}"
+                                   class="flex-1 min-w-0 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                            <button type="button" onclick="copiarLinkSala(this)" class="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Copiar</button>
+                        </div>
+                        <p class="mt-1.5 text-xs text-slate-500">Compartilhe este link único com os participantes.</p>
+                        <form method="POST" action="{{ route('admin.sala.remover', $treinamento) }}" onsubmit="return confirm('Remover a sala? Os links deixarão de funcionar.');" class="mt-4">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-xs text-slate-400 hover:text-red-600">Remover sala</button>
+                        </form>
+                        <script>
+                            function copiarLinkSala(btn) {
+                                var campo = document.getElementById('link-sala');
+                                navigator.clipboard.writeText(campo.value).then(function () {
+                                    var txt = btn.textContent; btn.textContent = 'Copiado!';
+                                    setTimeout(function () { btn.textContent = txt; }, 1500);
+                                });
+                            }
+                        </script>
+                    @endif
+                </div>
+            @endif
+
             <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 class="font-semibold text-slate-800 mb-1">Sessões e presença</h2>
                 <p class="text-sm text-slate-500 mb-4">{{ $treinamento->sessoes()->count() }} sessão(ões) cadastrada(s).</p>

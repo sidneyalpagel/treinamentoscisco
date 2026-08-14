@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Gestao;
 
 use App\Http\Controllers\Controller;
 use App\Models\Configuracao;
+use App\Support\JitsiToken;
 use App\Support\SmtpRuntime;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,13 +13,15 @@ use Illuminate\View\View;
 
 class ConfiguracaoController extends Controller
 {
-    /** Tela de configurações de e-mail (SMTP). */
+    /** Tela de configurações da plataforma (e-mail e videoconferência). */
     public function edit(): View
     {
-        $smtp = Configuracao::mapa(SmtpRuntime::CHAVES);
-        $configurado = SmtpRuntime::configurado();
-
-        return view('gestao.configuracoes.edit', compact('smtp', 'configurado'));
+        return view('gestao.configuracoes.edit', [
+            'smtp' => Configuracao::mapa(SmtpRuntime::CHAVES),
+            'configurado' => SmtpRuntime::configurado(),
+            'jitsi' => Configuracao::mapa(JitsiToken::CHAVES),
+            'jitsiConfigurado' => JitsiToken::configurado(),
+        ]);
     }
 
     /** Salva as configurações de SMTP. */
@@ -52,6 +55,30 @@ class ConfiguracaoController extends Controller
         }
 
         return back()->with('sucesso', 'Configurações de e-mail salvas.');
+    }
+
+    /** Salva as configurações de videoconferência (Jitsi). */
+    public function atualizarJitsi(Request $request): RedirectResponse
+    {
+        $dados = $request->validate([
+            'jitsi_domain' => ['nullable', 'string', 'max:255'],
+            'jitsi_app_id' => ['nullable', 'string', 'max:255'],
+            'jitsi_app_secret' => ['nullable', 'string', 'max:255'],
+        ], [], [
+            'jitsi_domain' => 'domínio',
+            'jitsi_app_id' => 'app id',
+            'jitsi_app_secret' => 'segredo',
+        ]);
+
+        Configuracao::definir('jitsi_domain', $dados['jitsi_domain'] ?? null);
+        Configuracao::definir('jitsi_app_id', $dados['jitsi_app_id'] ?? null);
+
+        // Segredo só é alterado quando um novo valor é digitado.
+        if (filled($dados['jitsi_app_secret'] ?? null)) {
+            Configuracao::definir('jitsi_app_secret', $dados['jitsi_app_secret']);
+        }
+
+        return back()->with('sucesso', 'Configurações de videoconferência salvas.');
     }
 
     /** Envia um e-mail de teste com as configurações atuais. */

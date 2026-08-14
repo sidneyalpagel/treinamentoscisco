@@ -16,7 +16,7 @@ class Configuracao extends Model
     protected $fillable = ['chave', 'valor'];
 
     /** Chaves cujo valor é armazenado cifrado. */
-    public const SECRETAS = ['smtp_password'];
+    public const SECRETAS = ['smtp_password', 'jitsi_app_secret'];
 
     /** Lê o valor de uma configuração (decifra se for sensível). */
     public static function valor(string $chave, mixed $default = null): mixed
