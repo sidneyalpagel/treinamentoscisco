@@ -151,6 +151,8 @@ EOF
 PORTAL_WEBHOOK="${PORTAL_WEBHOOK}"
 PORTAL_TOKEN="${GRAVACAO_SECRET}"
 EOF
+    # o finalize.sh roda como usuário 'jibri' — precisa poder ler o .env
+    chown jibri:jibri /etc/jitsi/jibri/finalize.env
     chmod 600 /etc/jitsi/jibri/finalize.env
     ok "finalize.env configurado (webhook do portal)."
     warn "No portal (Configurações → Gravação): jibri_base_url = http://<IP-do-jibri>:${REC_PORT}/rec ; gravacao_secret = (o mesmo GRAVACAO_SECRET)."
