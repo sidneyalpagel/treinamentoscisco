@@ -34,11 +34,15 @@
             <div class="border-2 border-white/30 rounded-md">
                 <div class="bg-white px-10 py-12 sm:px-16 sm:py-16 text-center">
 
-                    <div class="flex items-center justify-center gap-3 mb-8">
-                        <span class="grid place-items-center w-12 h-12 rounded-lg bg-brand-800 text-white">
-                            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814"/></svg>
-                        </span>
-                        <span class="text-lg font-bold text-brand-800">Plataforma de Treinamentos</span>
+                    <div class="mb-8">
+                        @if (file_exists(public_path('images/ciscopar-logo.png')))
+                            <img src="{{ asset('images/ciscopar-logo.png') }}" alt="CISCOPAR — Consórcio Intermunicipal de Saúde" class="h-16 w-auto mx-auto">
+                        @else
+                            <span class="grid place-items-center w-12 h-12 rounded-lg bg-brand-800 text-white mx-auto">
+                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814"/></svg>
+                            </span>
+                        @endif
+                        <p class="mt-3 text-xs uppercase tracking-[0.25em] text-slate-400">Plataforma de Treinamentos</p>
                     </div>
 
                     <h1 class="text-4xl sm:text-5xl font-bold tracking-[0.2em] text-brand-900 uppercase">Certificado</h1>
@@ -49,7 +53,8 @@
 
                     <p class="mt-6 text-slate-600 text-lg leading-relaxed max-w-2xl mx-auto">
                         participou do treinamento
-                        <strong class="text-slate-800">“{{ $certificado->inscricao->treinamento->titulo }}”</strong>@if ($certificado->carga_horaria), com carga horária de <strong class="text-slate-800">{{ $certificado->carga_horaria }} horas</strong>@endif,
+                        <strong class="text-slate-800">“{{ $certificado->inscricao->treinamento->titulo }}”</strong>,
+                        promovido pelo <strong class="text-slate-800">CISCOPAR — Consórcio Intermunicipal de Saúde</strong>@if ($certificado->carga_horaria), com carga horária de <strong class="text-slate-800">{{ $certificado->carga_horaria }} horas</strong>@endif,
                         realizado em {{ $certificado->inscricao->treinamento->data_inicio->translatedFormat('d \d\e F \d\e Y') }}.
                     </p>
 
