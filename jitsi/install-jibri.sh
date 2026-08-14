@@ -22,6 +22,8 @@ DOMAIN="${DOMAIN:-}"
 JIBRI_CONTROL_PASS="${JIBRI_CONTROL_PASS:-}"
 JIBRI_RECORDER_PASS="${JIBRI_RECORDER_PASS:-}"
 RECORDINGS_DIR="${RECORDINGS_DIR:-/srv/recordings}"
+CERT_DIR="${CERT_DIR:-/opt/certificados}"
+CERT_FULLCHAIN="${CERT_FULLCHAIN:-$CERT_DIR/${DOMAIN}.crt}"
 FINALIZE_SRC="${FINALIZE_SRC:-$SCRIPT_DIR/finalize.sh}"
 
 c() { printf '\033[%sm' "$1"; }
@@ -87,6 +89,18 @@ if [ -n "$DRIVER_URL" ] && [ "$DRIVER_URL" != "null" ]; then
     ok "chromedriver $(chromedriver --version | awk '{print $2}') instalado."
 else
     warn "Não achei chromedriver para o Chrome ${CHROME_VER}. Instale manualmente em /usr/local/bin/chromedriver."
+fi
+
+# ---------------------------------------------------------------------------
+# 3b. Confiar no certificado interno (Chrome do Jibri acessa https://DOMAIN)
+# ---------------------------------------------------------------------------
+if [ -f "$CERT_FULLCHAIN" ]; then
+    log "Instalando o certificado interno na trust store do sistema..."
+    install -m 0644 "$CERT_FULLCHAIN" "/usr/local/share/ca-certificates/${DOMAIN}.crt"
+    update-ca-certificates || warn "update-ca-certificates retornou aviso (verifique o formato PEM do cert)."
+    ok "Certificado interno confiado."
+else
+    warn "Sem $CERT_FULLCHAIN — o Chrome do Jibri vai depender de --ignore-certificate-errors."
 fi
 
 # ---------------------------------------------------------------------------
@@ -161,7 +175,7 @@ jibri {
   chrome { flags = [
     "--use-fake-ui-for-media-stream", "--start-maximized", "--kiosk",
     "--enabled", "--disable-infobars", "--autoplay-policy=no-user-gesture-required",
-    "--no-sandbox", "--disable-dev-shm-usage"
+    "--no-sandbox", "--disable-dev-shm-usage", "--ignore-certificate-errors"
   ] }
 }
 EOF

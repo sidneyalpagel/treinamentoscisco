@@ -1,11 +1,20 @@
 # Copie para "jitsi.conf" (mesma pasta) e ajuste. Lido automaticamente pelo install-jitsi.sh.
 # Alternativamente, passe as mesmas variáveis por ambiente na linha de comando.
 
-# FQDN público do Jitsi (obrigatório). Precisa ter DNS apontado para a VM Core.
+# FQDN do Jitsi (obrigatório). No DNS INTERNO, aponte para o IP da VM Core.
 DOMAIN=meet.ciscopar.com.br
 
-# E-mail para o Let's Encrypt (recomendado). Deixe vazio para usar self-signed.
-LE_EMAIL=ti@ciscopar.com.br
+# --- Certificado próprio (domínio interno) ---------------------------------
+# Coloque os arquivos nas DUAS VMs (Core e Jibri) em CERT_DIR:
+#   <CERT_DIR>/<DOMAIN>.crt  = certificado + cadeia (PEM)
+#   <CERT_DIR>/<DOMAIN>.key  = chave privada (PEM)
+CERT_DIR=/opt/certificados
+# CERT_FULLCHAIN e CERT_KEY só se os nomes forem diferentes do padrão acima:
+# CERT_FULLCHAIN=/opt/certificados/meet.ciscopar.com.br.crt
+# CERT_KEY=/opt/certificados/meet.ciscopar.com.br.key
+
+# Alternativa (NÃO usar em domínio interno): Let's Encrypt HTTP-01.
+# LE_EMAIL=ti@ciscopar.com.br
 
 # Autenticação por token. O MESMO par vai no portal Laravel para assinar os acessos.
 JWT_APP_ID=ciscopar

@@ -7,11 +7,15 @@
 #
 # Rode como root NA VM do Jitsi Core (não no servidor do portal).
 #
-#   sudo DOMAIN=meet.ciscopar.com.br LE_EMAIL=ti@ciscopar.com.br ./install-jitsi.sh
+#   # coloque antes os certificados em /opt/certificados/<DOMAIN>.crt e .key
+#   sudo DOMAIN=meet.ciscopar.com.br ./install-jitsi.sh
 #
 # Variáveis (env ou jitsi.conf ao lado do script):
-#   DOMAIN           (obrigatório)  FQDN público do Jitsi, ex.: meet.ciscopar.com.br
-#   LE_EMAIL         (recomendado)  E-mail para o Let's Encrypt. Vazio = pula TLS (self-signed).
+#   DOMAIN           (obrigatório)  FQDN do Jitsi, ex.: meet.ciscopar.com.br
+#   CERT_DIR         (opcional)     Pasta dos certificados. Padrão: /opt/certificados
+#   CERT_FULLCHAIN   (opcional)     Cert + cadeia (PEM). Padrão: <CERT_DIR>/<DOMAIN>.crt
+#   CERT_KEY         (opcional)     Chave privada (PEM). Padrão: <CERT_DIR>/<DOMAIN>.key
+#   LE_EMAIL         (opcional)     Alternativa: Let's Encrypt (só se NÃO houver cert próprio).
 #   JWT_APP_ID       (opcional)     App id do token. Padrão: ciscopar
 #   JWT_APP_SECRET   (opcional)     Segredo do token. Vazio = gera um e mostra no fim.
 #   JVB_LOCAL_IP     (opcional)     IP interno da VM (NAT harvester do videobridge).
@@ -28,6 +32,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # --- parâmetros ------------------------------------------------------------
 DOMAIN="${DOMAIN:-}"
+CERT_DIR="${CERT_DIR:-/opt/certificados}"
+CERT_FULLCHAIN="${CERT_FULLCHAIN:-$CERT_DIR/${DOMAIN}.crt}"
+CERT_KEY="${CERT_KEY:-$CERT_DIR/${DOMAIN}.key}"
 LE_EMAIL="${LE_EMAIL:-}"
 JWT_APP_ID="${JWT_APP_ID:-ciscopar}"
 JWT_APP_SECRET="${JWT_APP_SECRET:-}"
@@ -120,19 +127,29 @@ apt-get install -y jitsi-meet
 ok "jitsi-meet instalado."
 
 # ---------------------------------------------------------------------------
-# 6. TLS via Let's Encrypt (se LE_EMAIL informado)
+# 6. TLS — certificado próprio (/opt/certificados) ou, alternativamente, LE
 # ---------------------------------------------------------------------------
-if [ -n "$LE_EMAIL" ]; then
+NGINX_SITE="/etc/nginx/sites-available/${DOMAIN}.conf"
+if [ -f "$CERT_FULLCHAIN" ] && [ -f "$CERT_KEY" ]; then
+    log "Aplicando certificado próprio ao nginx (${CERT_FULLCHAIN})..."
+    [ -f "$NGINX_SITE" ] || die "Config nginx do Jitsi não encontrada: $NGINX_SITE"
+    # substitui apenas as diretivas de certificado no site do Jitsi
+    sed -i -E "s|^(\s*ssl_certificate_key)\s+.*;|\1 ${CERT_KEY};|" "$NGINX_SITE"
+    sed -i -E "s|^(\s*ssl_certificate)\s+[^;]*;|\1 ${CERT_FULLCHAIN};|" "$NGINX_SITE"
+    nginx -t || die "nginx -t falhou após apontar o certificado — confira $NGINX_SITE."
+    ok "Certificado próprio aplicado."
+elif [ -n "$LE_EMAIL" ]; then
     if [ ! -e "/etc/letsencrypt/live/${DOMAIN}" ]; then
-        log "Emitindo certificado Let's Encrypt (requer DNS de ${DOMAIN} apontado e porta 80 aberta)..."
+        log "Sem cert em ${CERT_DIR}; tentando Let's Encrypt (requer DNS público + porta 80)..."
         echo "$LE_EMAIL" | /usr/share/jitsi-meet/scripts/install-letsencrypt-cert.sh \
-            || die "Falha no Let's Encrypt. Confira DNS/porta 80 e rode o script novamente."
+            || die "Falha no Let's Encrypt. Para domínio interno, use o certificado próprio em ${CERT_DIR}."
         ok "Certificado emitido."
     else
         ok "Certificado Let's Encrypt já existe — mantido."
     fi
 else
-    warn "LE_EMAIL vazio: seguindo com certificado self-signed (navegador vai alertar)."
+    warn "Sem certificado em ${CERT_DIR} (${DOMAIN}.crt/.key) e sem LE_EMAIL: seguindo self-signed."
+    warn "Coloque os certificados em ${CERT_DIR} e rode o script novamente."
 fi
 
 # ---------------------------------------------------------------------------

@@ -94,11 +94,13 @@ flowchart LR
 
 ## 5. Rede, DNS e TLS
 
-- DNS: `meet.ciscopar.com.br` → IP público da VM Jitsi Core.
-- Portas Jitsi Core: **TCP 443** (web + fallback), **UDP 10000** (mídia), TCP 4443 (opcional).
-- Jibri: acesso à VM Jitsi Core (XMPP) — rede interna entre elas.
-- TLS: Let's Encrypt (`install-letsencrypt-cert.sh` do próprio Jitsi).
-- Firewall: liberar só o necessário; Jibri/MinIO não expostos à internet pública.
+- **Domínio interno** (sem exposição à internet): `meet.ciscopar.com.br` no **DNS interno**
+  (AD/servidor DNS) → **IP interno da VM Core**. A VM Jibri não precisa de nome/DNS.
+- Portas Jitsi Core (rede interna): **TCP 443** (web), **UDP 10000** (mídia), TCP 4443 (fallback).
+- Jibri → Core: XMPP na rede interna entre as VMs.
+- **TLS: certificado próprio da CISCOPAR** em `/opt/certificados/<DOMAIN>.crt` e `.key`, nas
+  **duas VMs** (Core: aplicado ao nginx; Jibri: instalado na trust store para o Chrome do gravador).
+  Let's Encrypt HTTP-01 **não se aplica** (domínio interno).
 
 ## 6. Segurança, JWT e LGPD
 
