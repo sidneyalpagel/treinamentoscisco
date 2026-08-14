@@ -210,6 +210,10 @@ if [ ! -f "$APP_DIR/.env" ]; then
     ok ".env configurado (APP_URL=${APP_URL}, banco=${DB_DATABASE})."
 fi
 
+# Reafirma a URL base em toda execução: garante que todos os links gerados
+# (validação de certificado, link de presença, e-mails, etc.) usem o domínio.
+set_env APP_URL "$APP_URL"
+
 # ---------------------------------------------------------------------------
 # 4. Manutenção
 # ---------------------------------------------------------------------------
