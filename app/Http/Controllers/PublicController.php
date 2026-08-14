@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\InscricaoRequest;
+use App\Mail\LinkReuniao;
 use App\Models\Inscricao;
 use App\Models\Reuniao;
 use App\Models\Treinamento;
 use App\Support\JitsiToken;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class PublicController extends Controller
@@ -63,6 +65,19 @@ class PublicController extends Controller
             $request->validated(),
             ['status' => Inscricao::STATUS_CONFIRMADA],
         ));
+
+        // Treinamento online com sala: envia o link da reunião por e-mail ao inscrito.
+        if ($treinamento->modalidadeOnline() && $treinamento->temSala()) {
+            try {
+                Mail::to($inscricao->email)->send(new LinkReuniao(
+                    $treinamento,
+                    route('sala.publica', $treinamento->sala_codigo),
+                    $inscricao->nome,
+                ));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return redirect()
             ->route('treinamentos.show', $treinamento)
