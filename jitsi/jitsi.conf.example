@@ -1,0 +1,30 @@
+# Copie para "jitsi.conf" (mesma pasta) e ajuste. Lido automaticamente pelo install-jitsi.sh.
+# Alternativamente, passe as mesmas variáveis por ambiente na linha de comando.
+
+# FQDN público do Jitsi (obrigatório). Precisa ter DNS apontado para a VM Core.
+DOMAIN=meet.ciscopar.com.br
+
+# E-mail para o Let's Encrypt (recomendado). Deixe vazio para usar self-signed.
+LE_EMAIL=ti@ciscopar.com.br
+
+# Autenticação por token. O MESMO par vai no portal Laravel para assinar os acessos.
+JWT_APP_ID=ciscopar
+# Deixe vazio para o script gerar um segredo forte e exibi-lo ao final.
+JWT_APP_SECRET=
+
+# NAT harvester do videobridge — preencha AMBOS se a VM estiver atrás de NAT.
+# JVB_LOCAL_IP=10.0.0.20
+# JVB_PUBLIC_IP=200.x.x.x
+
+# true = o script configura o firewall UFW automaticamente.
+ENABLE_UFW=false
+
+# --- Gravação (Jibri) ------------------------------------------------------
+# As MESMAS senhas vão no enable-recording-core.sh (Core) e no install-jibri.sh (VM Jibri).
+# Deixe vazio e gere com: openssl rand -hex 16
+JIBRI_CONTROL_PASS=
+JIBRI_RECORDER_PASS=
+
+# Onde o Jibri grava os MP4 antes do finalize.
+RECORDINGS_DIR=/srv/recordings
+

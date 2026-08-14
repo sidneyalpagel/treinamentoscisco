@@ -1,0 +1,3 @@
+# Config local com segredos (não versionar)
+jitsi.conf
+finalize.env
