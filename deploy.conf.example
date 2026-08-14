@@ -1,0 +1,39 @@
+# Configuração do deploy.sh
+# Copie para "deploy.conf" (não versionado) e ajuste aos seus valores:
+#   cp deploy.conf.example deploy.conf
+# Alternativamente, passe tudo por variáveis de ambiente ao chamar o script.
+
+# --- Obrigatórios ---
+HESTIA_USER="ciscopar"                              # usuário do painel Hestia dono do domínio
+DOMAIN="treinamentos.ciscopar.com.br"               # domínio web adicionado no Hestia
+
+# --- Código / PHP / Node ---
+BRANCH="main"
+PHP_VERSION="8.3"                                   # versão do PHP definida para o domínio no Hestia
+NODE_MAJOR="22"                                     # versão do Node instalada automaticamente se faltar
+
+# --- Banco (usado só na PRIMEIRA execução, para gerar o .env) ---
+# Crie o banco antes pelo painel Hestia (Banco de Dados) e informe aqui.
+# Se deixar em branco, o script pergunta interativamente no primeiro deploy.
+DB_HOST="127.0.0.1"
+DB_PORT="3306"
+DB_DATABASE=""                                      # ex.: ciscopar_treinamentos
+DB_USERNAME=""                                      # ex.: ciscopar_treino
+DB_PASSWORD=""
+
+# APP_URL="https://treinamentos.ciscopar.com.br"    # padrão: https://$DOMAIN
+
+# --- Passos (true/false) ---
+INSTALL_SYSTEM_DEPS="true"   # instala composer/node automaticamente se faltarem (exige root)
+UPDATE_CODE="true"           # git pull nas execuções seguintes
+SETUP_DOCROOT="true"         # aponta public_html -> <repo>/public
+BUILD_ASSETS="true"
+RUN_MIGRATIONS="true"
+RUN_SEED="false"             # deixe true só no primeiro deploy, se quiser dados de exemplo
+MAINTENANCE_MODE="true"
+RELOAD_FPM="true"
+
+# --- Binários (sobrescreva só se não estiverem no PATH) ---
+# PHP_BIN="php8.3"
+# COMPOSER_BIN="composer"
+# NPM_BIN="npm"

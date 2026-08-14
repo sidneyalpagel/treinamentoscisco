@@ -59,6 +59,18 @@ npm run build                  # compila os assets (produção)
 npm run dev                    # assets em modo desenvolvimento (hot reload)
 ```
 
+## Deploy em produção (HestiaCP)
+
+Pré-requisitos (uma vez, pelo painel Hestia): usuário do painel, domínio web, versão do PHP do domínio e um banco MySQL/MariaDB criado.
+
+```bash
+git clone https://github.com/sidneyalpagel/treinamentoscisco.git laravel
+cd laravel
+sudo HESTIA_USER=ciscopar DOMAIN=treinamentos.ciscopar.com.br ./deploy.sh
+```
+
+O [`deploy.sh`](deploy.sh) é idempotente e cuida de tudo: instala dependências que faltarem (composer, Node.js), configura o `.env` (pede as credenciais do banco na 1ª vez), instala pacotes PHP, compila os assets, roda migrations, recria caches, ajusta permissões, aponta o `public_html` para `public/` e recarrega o PHP-FPM. Para atualizações, basta rodar `./deploy.sh` de novo. Configuração opcional via `deploy.conf` (veja `deploy.conf.example`).
+
 ## Estrutura (base atual)
 
 | Área | Descrição |
