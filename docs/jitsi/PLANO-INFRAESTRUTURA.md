@@ -134,8 +134,11 @@ Mudanças no portal (baixo impacto de carga — só gera links/tokens e registra
 - [x] **Fase 2 — Gravação:** `enable-recording-core.sh` (Core) + `install-jibri.sh` (VM Jibri).
       **Concluída** — grava `.mp4` em `/srv/recordings`. Travas resolvidas: detector jibri no
       Jicofo; módulo Lua `inspect` no 5.4; `token_verification_allowlist` para o recorder (JWT).
-- [ ] **Fase 2b — Armazenamento:** `jitsi/finalize.sh` envia o MP4 ao MinIO e chama o webhook do
-      portal (depende do endpoint da Fase 3). Configurar `/etc/jitsi/jibri/finalize.env` + MinIO.
+- [x] **Fase 2b + Fase 3 (portal) — Concluídas.** Portal Laravel expandido para treinamentos +
+      reuniões online: SMTP configurável, convite/ativação de gestor, JWT + "Criar sala"
+      (gestor=moderador, participantes por link único) e **gravação → e-mail** (webhook do Jibri →
+      `Gravacao` → link de download assinado; arquivo servido do Jibri via nginx `/rec` e streaming
+      pelo portal). O `finalize.sh` chama o webhook; sem MinIO (arquivo permanece no Jibri).
 
 ### Scripts (em `jitsi/`)
 
