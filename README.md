@@ -66,7 +66,7 @@ npm run dev                    # assets em modo desenvolvimento (hot reload)
 - [x] **Agenda** pública de treinamentos
 - [x] **Inscrições** (formulário público + gestão das listas + exportação CSV)
 - [x] **Lista de presença** por sessão (auto check-in público + gestão + CSV)
-- [ ] **Certificados** por participante (com validação)
+- [x] **Certificados** por participante (emissão + impressão/PDF + validação pública)
 
 ## Observações de ambiente
 
